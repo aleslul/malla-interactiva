@@ -1,0 +1,9 @@
+//////////////////////////////////////////////////////////////
+//////////  Esta pagina web fue hecha por Aleslul   //////////
+//////////////////////////////////////////////////////////////
+
+
+Cosas por agregar:
+    -   Agregar un selector de themes con nuevas paletas de colores
+    -   Añadir un calendario en conexión con Google calendar
+    -   Agregar una página de carga con mensajes emotivos

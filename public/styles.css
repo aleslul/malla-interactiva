@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --primario: #FFF9EC;
+    --secundario: #FFDCCC;
+    --complementario: #FCB1A6;
+    --fondo: #FB6376;
+    --texto: #5d2a42;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+    color: var(--texto);
+}
+
+body {
+    background-color: var(--primario);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+nav{
+    margin-top: 25px;
+    margin-bottom: 100px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+}
+
+.wrapBtn{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.webs{
+    border-radius: 8px;
+    border: none;
+    width: 130px;
+    height: 40px;
+    padding: 10px;
+    background-color: var(--secundario);
+    color: var(--fondo);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.webs:hover {
+    background-color: var(--fondo);
+    color: var(--secundario);
+}
+
+.textoNav {
+    position: relative;
+    height: 1.5em;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    font-size: 3rem; 
+}
+
+.textoNav span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 1.5em;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+h1, h2, h3 {
+    user-select: none;
+}
+
+h3 {
+    color: var(--fondo);
+}
+
+.login-button{
+    border-radius: 8px;
+    border: none;
+    width: 130px;
+    height: 40px;
+    padding: 10px;
+    background-color: var(--fondo);
+    color: var(--secundario);
+    font-size: 0.9rem;
+}
+
+.login-button:hover {
+    background-color: var(--secundario);
+    color: var(--fondo);
+}
+
+#sesion-btn {
+    background-color: var(--texto);
+    color: var(--secundario);
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: 150px;
+    border: none;
+    cursor: pointer;
+}
+
+#sesion-btn:hover {
+    background-color: var(--fondo);
+    color: var(--secundario);
+}
+
+h1{
+    color: var(--texto);
+    font-weight: 400;
+    font-size: 3rem;
+}
+
+.wrapBott{
+    display: flex;
+    flex-direction: row;
+    padding: 0 40px;
+    margin: 80px 0;
+    gap: 50px;
+}
+
+.electivos{
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    gap: 10px;
+}
+
+.wrapElectivos {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wrapRequisitos{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    gap: 80px;
+}
+
+.condicionesBachiller, .condicionesEgresado{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+.condicionesBachiller .idioma{
+    width: 100%;
+    background-color: var(--secundario);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    gap: 10px;
+    padding: 10px 0 0 0;
+}
+
+.idioma .idiomaTxt{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+.idioma .idiomaNiveles{
+    display: grid;
+    grid-template-columns: repeat(4, 25%);
+}
+
+.idiomaNiveles .curso:nth-child(1) {
+    border-radius: 0 0 0 10px;
+}
+
+.idiomaNiveles .curso:nth-child(2), .idiomaNiveles .curso:nth-child(3) {
+    border-radius: 0;
+}
+
+.idiomaNiveles .curso:nth-child(4), #segundoIdioma .idiomaNiveles .curso:nth-child(2) {
+    border-radius: 0 0 10px 0;
+}
+
+#segundoIdioma .idiomaNiveles{
+    grid-template-columns: repeat(2, 50%);
+}
+
+.wrapMain{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 40px;
+}
+
+.main{
+    height: auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(13, 200px);
+    gap: 10px;
+    align-content: center;
+    justify-content: space-between;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-color: var(--secundario) #ffffff00;
+    scrollbar-width: auto;
+    padding-bottom: 10px;
+    mask-image: linear-gradient(to right, transparent 0.5%, black 1%, black 99%, transparent 99.5%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0.5%, black 1%, black 99%, transparent 99.5%);
+
+}
+
+
+.main::-webkit-scrollbar {
+    height: 8px;
+}
+
+.main::-webkit-scrollbar-thumb {
+    background-color: var(--texto);
+    border-radius: 4px;
+}
+
+.main::-webkit-scrollbar-track {
+    background-color: var(--fondo2);
+}
+
+
+.ciclo{
+    padding: 10px;
+    display: flex;
+    border-radius: 10px;
+    height: auto;
+    width: 200px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ciclo p {
+    user-select: none;
+}
+
+.curso{
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 10px;
+    height: auto;
+    width: 100%;
+    text-align: center;
+    background-color: var(--secundario);
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.curso.completado p {
+    color: var(--secundario);
+    text-decoration: line-through;
+    opacity: 0.9;
+}
+
+.curso.curso.completado {
+    background-color: var(--fondo);
+}
+
+.curso.bloqueado {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+    position: relative;
+}
+
+.curso.bloqueado::after {
+    content: "🔒";
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    font-size: 1.2rem;
+}
+
+#easter-audio {
+    display: none;
+}
+
+.easter-egg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
