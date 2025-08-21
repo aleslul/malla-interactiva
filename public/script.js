@@ -6,13 +6,12 @@ import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/fireb
 
 // DATABASE
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_API_KEY,
-    authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_SOTRAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_APP_ID,
-    measurementId: import.meta.env.VITE_MEASUREMENT_ID
+    apiKey: "AIzaSyDTHGzByR6Vi90xSPLuXklzVi8mLMcsP0g",
+    authDomain: "mallainteractiva-bd28f.firebaseapp.com",
+    projectId: "mallainteractiva-bd28f",
+    storageBucket: "mallainteractiva-bd28f.firebasestorage.app",
+    messagingSenderId: "321124874020",
+    appId: "1:321124874020:web:0b00fd1f53fa1bd4f725b1"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -398,4 +397,14 @@ document.querySelectorAll('.curso').forEach(curso => {
         e.preventDefault();
         mostrarTooltipCurso(curso, e.pageX, e.pageY, 'info');
     });
+});
+
+
+//TODO: RENDERIZAR CALENDARIO
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth'
+    });
+    calendar.render();
 });
