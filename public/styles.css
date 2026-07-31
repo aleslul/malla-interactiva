@@ -320,3 +320,65 @@ h1{
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+
+/* ANUNCIO */
+/* El fondo que cubre toda la pantalla */
+.overlay {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Oscurece el fondo */
+    z-index: 1000; /* Asegura que esté arriba de la malla */
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+/* El cuadro blanco del anuncio */
+.ad_content{
+    background: var(--primario);
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Botón de cerrar (X) */
+.cerrar_btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 25px;
+    cursor: pointer;
+    color: #333;
+}
+
+.btnCerrar{
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 250px;
+    height: 40px;
+    padding: 10px;
+    background-color: var(--fondo);
+    color: var(--secundario);
+    font-size: 0.9rem;
+}
+
+.btnCerrar:hover {
+    background-color: var(--secundario);
+    color: var(--fondo);
+}
+
+.img_yape {
+    height: 200px;
+    width: 200px;
+    margin: 20px;
+}

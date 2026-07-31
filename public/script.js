@@ -14,6 +14,7 @@ const firebaseConfig = {
     appId: "1:321124874020:web:0b00fd1f53fa1bd4f725b1"
 };
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -130,11 +131,14 @@ document.querySelectorAll('.curso').forEach(curso => {
         actualizarCursosBloqueados();
     });
 
-    curso.addEventListener('contextmenu', (e) => {
+/*     curso.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        mostrarTooltip(curso, e.pageX, e.pageY);
-    });
+        mostrarTooltipCurso(curso, e.pageX, e.pageY, 'info');
+    }); */
 });
+
+// IMPORTANTE: agregar el scope de Google Calendar al provider
+provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
 // EL LOGIN CON GOOGLE
 document.getElementById('login-btn').addEventListener('click', () => {
@@ -142,7 +146,13 @@ document.getElementById('login-btn').addEventListener('click', () => {
         .then(async (result) => {
             const user = result.user;
             userUID = user.uid;
+
+            // 👇 obtener el token de Google Calendar
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const accessToken = credential.accessToken;
+
             console.log("Sesión iniciada como:", user.displayName);
+            console.log("Token de acceso para Calendar:", accessToken);
 
             // Ocultar botón de login
             const loginBtn = document.getElementById('login-btn');
@@ -192,6 +202,11 @@ document.getElementById('login-btn').addEventListener('click', () => {
             });
 
             loginBtn.parentNode.appendChild(sesionBtn);
+
+            // 🔥 Aquí ya tienes el token => úsalo para cargar tu FullCalendar
+            // Ejemplo rápido:
+            // cargarCalendario(accessToken);
+
             const data = await cargarCursosFirestore();
             if (data) {
                 cursosCompletados = data;
@@ -213,6 +228,7 @@ document.getElementById('login-btn').addEventListener('click', () => {
             console.error("Error en el login:", error);
         });
 });
+
 
 // Cargar cursos completados desde Firestore
 async function cargarCursosFirestore() {
@@ -408,3 +424,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     calendar.render();
 });
+
