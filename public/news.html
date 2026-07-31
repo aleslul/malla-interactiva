@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <audio id="easter01" class="easter-audio" src="assets/cagada.mp3" preload="auto"></audio>
+    <audio id="easter02" class="easter-audio" src="assets/lenteja.mp3" preload="auto"></audio>
+    <nav>
+        <h1 class="textoNav"><span>Noticias</span></h1>
+        <div class="wrapBtn">
+            <button class="webs" onclick="location.href='index.html'" >Regresar</button>
+            <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
+            <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
+            <button class="login-button" id="login-btn">Iniciar Sesión</button>
+        </div>
+    </nav>
+    <div id="tooltip" style="
+        display: none; 
+        position: absolute; 
+        background: #fff2f2; 
+        padding: 10px; 
+        border-radius: 8px; 
+        box-shadow: 5px 5px 10px rgba(0,0,0,0.5); 
+        z-index: 999;">
+    </div>
+    <div class="wrapNews">
+        <h2>31/07/2026</h2>
+        <p>La malla curricular se ha actualizado con ellas algunos pre-requisitos de los cuales lo más importante es:</p>
+        <ul class="listaNews">
+            <li>
+                <b>Inglés:</b> Ahora es necesario tener el nivel <b>A2</b> de ingles a partir del <b>6to ciclo</b> y nivel <b>B1</b> a partir del <b>8vo ciclo</b>, para aplicar al Bachiller deberás tener nivel de ingles B2.
+            </li>
+            <li>
+                <b>Examen de Suficiencia</b> El examen de suficiencia médica es necesaria solamente para los cursos del 13vo ciclo, pero no es necesario para Bachiller, se movió a Otros.
+            </li>
+            <li>
+                <b>Trabajo de Investigación:</b> Ahora el trabajo de investigación no es necesaria para el Bachiller
+            </li>
+        </ul>
+    </div>
+</body>
+
+<style>
+    .wrapNews {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        padding-left: 80px;
+        padding-right: 80px;
+        padding-bottom: 20px;
+    }
+    .listaNews {
+        margin-left: 40px;
+    }
+
+    li {
+        margin-bottom: 8px;
+        font-size: 1.3rem;
+    }
+
+    h2 {
+        font-size: 2.1rem;
+    }
+
+    p {
+        font-size: 1.3rem;
+    }
+</style>
+</html>

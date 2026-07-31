@@ -313,6 +313,7 @@ function mostrarTooltipCurso(curso, x, y, tipo = 'info') {
         const nombresFaltantes = crudos.map(cod => {
             switch (cod) {
                 case 'allX': return "Todos los cursos hasta el 10mo ciclo";
+                case 'allXI': return "Todos los cursos hasta el 11vo ciclo";
                 case 'allXII': return "Todos los cursos hasta el 12vo ciclo";
                 case '8CRD': return "Mínimo 8 créditos electivos";
                 case 'EXSM': return "Examen de Suficiencia Médica";
@@ -344,6 +345,8 @@ function mostrarTooltipCurso(curso, x, y, tipo = 'info') {
             switch (cod) {
                 case 'allX':
                     return 'Todos los cursos hasta el 10mo ciclo';
+                case 'allXI':
+                    return 'Todos los cursos hasta el 11vo ciclo';
                 case 'allXII':
                     return 'Todos los cursos hasta el 12vo ciclo';
                 case '8CRD':

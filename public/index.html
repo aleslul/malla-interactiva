@@ -12,6 +12,7 @@
     <nav>
         <h1 class="textoNav"><span>Bienvenida, Fabiana</span></h1>
         <div class="wrapBtn">
+            <button class="webs" onclick="location.href='news.html'" >Noticias</button>
             <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
             <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
             <button class="login-button" id="login-btn">Iniciar Sesión</button>
@@ -44,7 +45,7 @@
                 <div class="curso" data-curso="REGE" data-nombre="Redacción General" data-creditos="3" data-id="003923" data-prerequisito="LYO1"></div>
                 <div class="curso" data-curso="RENA" data-nombre="Realidad Nacional" data-creditos="2" data-id="810347" data-prerequisito="DEU1"></div>
                 <div class="curso" data-curso="MOR1" data-nombre="Morfofisiología I" data-creditos="6" data-id="815192"  data-prerequisito="BCM1"></div>
-                <div class="curso" data-curso="INTI" data-nombre="Intro. a la Investigación" data-creditos="3" data-id="813510"></div>
+                <div class="curso" data-curso="INTI" data-nombre="Intro. a la Investigación" data-creditos="3" data-id="813510" data-prerequisito="INM1"></div>
                 <div class="curso" data-curso="BIOQ" data-nombre="Bioquímica" data-creditos="5" data-id="001013" data-prerequisito="QUI1"></div>
                 <div class="curso" data-curso="ANAT" data-nombre="Anatomía General" data-creditos="3" data-id="813995" data-prerequisito="BCM1"></div>
             </div>
@@ -63,81 +64,84 @@
                 <div class="curso" data-curso="INFB" data-nombre="Infectología Básica" data-creditos="5" data-id="815194" data-prerequisito="INMU"></div>
                 <div class="curso" data-curso="FCP1" data-nombre="Fisiopatología I" data-creditos="4" data-id="814091" data-prerequisito="MOR2,INMU"></div>
                 <div class="curso" data-curso="DESA" data-nombre="Desarrollo y Crecimiento" data-creditos="3" data-id="815195" data-prerequisito="GENM,MOR1"></div>
-                <div class="curso" data-curso="BIOE" data-nombre="Bioetica" data-creditos="2" data-id="814097" data-prerequisito="INM1,REGE"></div>
+                <div class="curso" data-curso="BIOE" data-nombre="Bioetica" data-creditos="2" data-id="814097" data-prerequisito="INM1,FILO"></div>
             </div>
             <div class="ciclo" data-ciclo="05">
                 <p>CICLO 05</p>
                 <div class="curso" data-curso="SALM" data-nombre="Salud Mental" data-creditos="4" data-id="815199" data-prerequisito="BIOE"></div>
                 <div class="curso" data-curso="MOR4" data-nombre="Morfofisiología IV" data-creditos="6" data-id="815196" data-prerequisito="MOR3"></div>
                 <div class="curso" data-curso="FUMI" data-nombre="Fundamentos de Medicina Interc" data-creditos="2" data-id="815200" data-prerequisito="FILO,RENA"></div>
-                <div class="curso" data-curso="FCP2" data-nombre="Fisiopatología II" data-creditos="5" data-id="815197" data-prerequisito="FCP1,MOR2,INFB"></div>
+                <div class="curso" data-curso="FCP2" data-nombre="Fisiopatología II" data-creditos="5" data-id="815197" data-prerequisito="FCP1,MOR3,INFB"></div>
                 <div class="curso" data-curso="BIES" data-nombre="Bioestadística" data-creditos="2" data-id="815198" data-prerequisito="ESTG,INTI"></div>
             </div>
             <div class="ciclo" data-ciclo="06">
                 <p>CICLO 06</p>
                 <div class="curso" data-curso="SEBS" data-nombre="Semiología Basada en la Simulación" data-creditos="2" data-id="815360" data-prerequisito="MOR4,FCP2,INA2"></div>
                 <div class="curso" data-curso="SEMI" data-nombre="Semiología" data-creditos="5" data-id="815201" data-prerequisito="MOR4,FCP2,INA2"></div>
-                <div class="curso" data-curso="FARM" data-nombre="Farmacología" data-creditos="6" data-id="815203" data-prerequisito="INFB"></div>
-                <div class="curso" data-curso="APAD" data-nombre="Apoyo al Diagnóstico" data-creditos="3" data-id="815202" data-prerequisito="MOR4"></div>
+                <div class="curso" data-curso="FARM" data-nombre="Farmacología" data-creditos="6" data-id="815203" data-prerequisito="INFB,INA2"></div>
+                <div class="curso" data-curso="APAD" data-nombre="Apoyo al Diagnóstico" data-creditos="3" data-id="815202" data-prerequisito="MOR4,INA2"></div>
                 <div class="curso" data-curso="ANPA" data-nombre="Anatomía Patológica" data-creditos="4" data-id="814101" data-prerequisito="MOR4,FCP2,INA2"></div>
             </div>
             <div class="ciclo" data-ciclo="07">
                 <p>CICLO 07</p>
-                <div class="curso" data-curso="SPYC" data-nombre="Seguridad del Paciente y Calidad" data-creditos="2" data-id="815206" data-prerequisito="BIOE,MEI1,EXSM,INB1"></div>
-                <div class="curso" data-curso="NYPS" data-nombre="Mutrición y Prácticas Saludables" data-creditos="4" data-id="815207" data-prerequisito="FARM"></div>
-                <div class="curso" data-curso="METD" data-nombre="Metodología de la Investigación" data-creditos="2" data-id="814106" data-prerequisito="BIES"></div>
-                <div class="curso" data-curso="MEI1" data-nombre="Medicina Interna I" data-creditos="10" data-id="815204" data-prerequisito="ANPA,SEMI,SEBS,APAD"></div>
-                <div class="curso" data-curso="EPID" data-nombre="Epidemiología" data-creditos="4" data-id="815205" data-prerequisito="BIES"></div>
+                <div class="curso" data-curso="NYPS" data-nombre="Mutrición y Prácticas Saludables" data-creditos="4" data-id="815207" data-prerequisito="FARM,INA2"></div>
+                <div class="curso" data-curso="METD" data-nombre="Metodología de la Investigación" data-creditos="2" data-id="814106" data-prerequisito="BIES,INA2"></div>
+                <div class="curso" data-curso="MEI1" data-nombre="Medicina Interna I" data-creditos="10" data-id="815204" data-prerequisito="ANPA,SEMI,SEBS,APAD,INA2"></div>
+                <div class="curso" data-curso="EPID" data-nombre="Epidemiología" data-creditos="4" data-id="815205" data-prerequisito="BIES,INA2"></div>
+                <div class="curso" data-curso="ATPS" data-nombre="Atención Primaria en la Salud" data-creditos="4" data-id="815210" data-prerequisito="SEMI,FUMI,INA2"></div>
+
             </div>
             <div class="ciclo" data-ciclo="08">
                 <p>CICLO 08</p>
-                <div class="curso" data-curso="SAPU" data-nombre="Salud Pública" data-creditos="4" data-id="815209" data-prerequisito="EPID,METD,ATPS,INB1,EXSM"></div>
-                <div class="curso" data-curso="MEI2" data-nombre="Medicina Interna II" data-creditos="10" data-id="815208" data-prerequisito="MEI1"></div>
-                <div class="curso" data-curso="MEBE" data-nombre="Medicina Basada en la Evidencia" data-creditos="2" data-id="815619" data-prerequisito="EPID,METD"></div>
-                <div class="curso" data-curso="ATPS" data-nombre="Atención Primaria en la Salud" data-creditos="4" data-id="815210" data-prerequisito="SEMI,FUMI"></div>
+                <div class="curso" data-curso="SPYC" data-nombre="Seguridad del Paciente y Calidad" data-creditos="2" data-id="815206" data-prerequisito="BIOE,MEI1,INB1"></div>   
+                <div class="curso" data-curso="SAPU" data-nombre="Salud Pública" data-creditos="4" data-id="815209" data-prerequisito="EPID,METD,ATPS,INB1"></div>
+                <div class="curso" data-curso="MEI2" data-nombre="Medicina Interna II" data-creditos="10" data-id="815208" data-prerequisito="MEI1,INB1"></div>
+                <div class="curso" data-curso="MEBE" data-nombre="Medicina Basada en la Evidencia" data-creditos="2" data-id="815619" data-prerequisito="EPID,METD,INB1"></div>
+
             </div>
             <div class="ciclo" data-ciclo="09">
                 <p>CICLO 09</p>
-                <div class="curso" data-curso="TES1" data-nombre="Tesis I" data-creditos="2" data-id="815212" data-prerequisito="MEBE"></div>
-                <div class="curso" data-curso="TERA" data-nombre="Terapeutica" data-creditos="2" data-id="001053" data-prerequisito="MEI2, FARM, SPYC"></div>
-                <div class="curso" data-curso="SICI" data-nombre="Simulación Clínica Integrada" data-creditos="3" data-id="815361" data-prerequisito="MEI2"></div>
-                <div class="curso" data-curso="MELE" data-nombre="Medicina Legal" data-creditos="2" data-id="001061" data-prerequisito="BIOE, MEI2, SAPU"></div>
-                <div class="curso" data-curso="MEI3" data-nombre="Medicina Interna III" data-creditos="10" data-id="815211" data-prerequisito="MEI2"></div>
+                <div class="curso" data-curso="TES1" data-nombre="Tesis I" data-creditos="2" data-id="815212" data-prerequisito="MEBE,INB1"></div>
+                <div class="curso" data-curso="TERA" data-nombre="Terapeutica" data-creditos="2" data-id="001053" data-prerequisito="MEI2,FARM,SPYC,INB1"></div>
+                <div class="curso" data-curso="SICI" data-nombre="Simulación Clínica Integrada" data-creditos="3" data-id="815361" data-prerequisito="MEI2,INB1"></div>
+                <div class="curso" data-curso="MELE" data-nombre="Medicina Legal" data-creditos="2" data-id="001061" data-prerequisito="BIOE,MEI2,SAPU,INB1"></div>
+                <div class="curso" data-curso="MEI3" data-nombre="Medicina Interna III" data-creditos="10" data-id="815211" data-prerequisito="MEI2,INB1"></div>
             </div>
             <div class="ciclo" data-ciclo="10">
                 <p>CICLO 10</p>
-                <div class="curso" data-curso="SIQI" data-nombre="Simulación Quirúrgica" data-creditos="2" data-id="815362" data-prerequisito="MEI3,SICI"></div>
-                <div class="curso" data-curso="ECOG" data-nombre="Ecografía" data-creditos="2" data-id="814113" data-prerequisito="APAD,SEMI"></div>
-                <div class="curso" data-curso="CPRF" data-nombre="Cuidados Peliativos y Rehabilitación Física" data-creditos="2" data-id="815214" data-prerequisito="TERA,SPYC"></div>
-                <div class="curso" data-curso="CIRU" data-nombre="Cirugía" data-creditos="11" data-id="815213" data-prerequisito="MEI3,SICI"></div>
-                <div class="curso" data-curso="ANC1" data-nombre="Análisis de Casos  I" data-creditos="2" data-id="815215" data-prerequisito="MEI3,SICI,TERA"></div>
+                <div class="curso" data-curso="SIQI" data-nombre="Simulación Quirúrgica" data-creditos="2" data-id="815362" data-prerequisito="MEI3,SICI,INB1"></div>
+                <div class="curso" data-curso="ECOG" data-nombre="Ecografía" data-creditos="2" data-id="814113" data-prerequisito="APAD,SEMI,INB1"></div>
+                <div class="curso" data-curso="CPRF" data-nombre="Cuidados Peliativos y Rehabilitación Física" data-creditos="2" data-id="815214" data-prerequisito="TERA,SPYC,INB1"></div>
+                <div class="curso" data-curso="CIRU" data-nombre="Cirugía" data-creditos="11" data-id="815213" data-prerequisito="MEI3,SICI,INB1"></div>
+                <div class="curso" data-curso="ANC1" data-nombre="Análisis de Casos  I" data-creditos="2" data-id="815215" data-prerequisito="MEI3,SICI,TERA,INB1"></div>
             </div>
             <div class="ciclo" data-ciclo="11">
                 <p>CICLO 11</p>
-                <div class="curso" data-curso="TES2" data-nombre="Tesis II" data-creditos="2" data-id="815218" data-prerequisito="TES1"></div>
-                <div class="curso" data-curso="SIPE" data-nombre="Simulación Pediátrica" data-creditos="2" data-id="815363" data-prerequisito="ANC1"></div>
-                <div class="curso" data-curso="SIGO" data-nombre="Simulación Gineco-Obstetricia" data-creditos="2" data-id="815364" data-prerequisito="CIRU,SIQI"></div>
-                <div class="curso" data-curso="PEDI" data-nombre="Pediatría" data-creditos="10" data-id="815216" data-prerequisito="ANC1"></div>
-                <div class="curso" data-curso="GIOB" data-nombre="Ginecología y Obstetricia" data-creditos="6" data-id="815217" data-prerequisito="CIRU,SIQI"></div>
+                <div class="curso" data-curso="TES2" data-nombre="Tesis II" data-creditos="2" data-id="815218" data-prerequisito="TES1,INB1"></div>
+                <div class="curso" data-curso="SIPE" data-nombre="Simulación Pediátrica" data-creditos="2" data-id="815363" data-prerequisito="ANC1,INB1"></div>
+                <div class="curso" data-curso="SIGO" data-nombre="Simulación Gineco-Obstetricia" data-creditos="2" data-id="815364" data-prerequisito="CIRU,SIQI,INB1"></div>
+                <div class="curso" data-curso="PEDI" data-nombre="Pediatría" data-creditos="10" data-id="815216" data-prerequisito="ANC1,INB1"></div>
+                <div class="curso" data-curso="GIOB" data-nombre="Ginecología y Obstetricia" data-creditos="6" data-id="815217" data-prerequisito="CIRU,SIQI,INB1"></div>
             </div>
             <div class="ciclo" data-ciclo="12">
                 <p>CICLO 12</p>
-                <div class="curso" data-curso="PRIN" data-nombre="Pre-Internado" data-creditos="16" data-id="815219" data-prerequisito="allX,INB2"></div>
-                <div class="curso" data-curso="INBI" data-nombre="Informática Biomédica" data-creditos="2" data-id="812812" data-prerequisito="SAPU, INB2"></div>
-                <div class="curso" data-curso="GESA" data-nombre="Gerencia en Salud" data-creditos="2" data-id="815220" data-prerequisito="SAPU, INB2"></div>
-                <div class="curso" data-curso="ANC2" data-nombre="Análisis de Casos II" data-creditos="2" data-id="815221" data-prerequisito="ANC1,INA2"></div>
+                <div class="curso" data-curso="PRIN" data-nombre="Pre-Internado" data-creditos="16" data-id="815219" data-prerequisito="allXI,INB1"></div>
+                <div class="curso" data-curso="INBI" data-nombre="Informática Biomédica" data-creditos="2" data-id="812812" data-prerequisito="SAPU,INB1"></div>
+                <div class="curso" data-curso="GESA" data-nombre="Gerencia en Salud" data-creditos="2" data-id="815220" data-prerequisito="SAPU,INB1"></div>
+                <div class="curso" data-curso="ANC2" data-nombre="Análisis de Casos II" data-creditos="2" data-id="815221" data-prerequisito="ANC1,INB1"></div>
             </div>
             <div class="ciclo" data-ciclo="13">
                 <p>CICLO 13</p>
-                <div class="curso" data-curso="TRIN" data-nombre="Trabajo de Investigación" data-creditos="1" data-id="815222" data-prerequisito="allXII,8CRD,EXSM"></div>
-                <div class="curso" data-curso="INPE" data-nombre="Internado en Pediatría" data-creditos="10" data-id="001078" data-prerequisito="allXII,8CRD,EXSM"></div>
-                <div class="curso" data-curso="INME" data-nombre="Internado en Medicina" data-creditos="10" data-id="001077" data-prerequisito="allXII,8CRD,EXSM"></div>
-                <div class="curso" data-curso="INCI" data-nombre="Internado en Cirugía" data-creditos="10" data-id="001075" data-prerequisito="allXII,8CRD,EXSM"></div>
-                <div class="curso" data-curso="INGO" data-nombre="Internado en Ginecología y Obstetricia" data-creditos="10" data-id="001076" data-prerequisito="allXII,8CRD,EXSM"></div>
+                <div class="curso" data-curso="TRIN" data-nombre="Trabajo de Investigación" data-creditos="1" data-id="815222" data-prerequisito="allXII,8CRD,EXSM,INB1"></div>
+                <div class="curso" data-curso="INPE" data-nombre="Internado en Pediatría" data-creditos="10" data-id="001078" data-prerequisito="allXII,8CRD,EXSM,INB1"></div>
+                <div class="curso" data-curso="INME" data-nombre="Internado en Medicina" data-creditos="10" data-id="001077" data-prerequisito="allXII,8CRD,EXSM,INB1"></div>
+                <div class="curso" data-curso="INCI" data-nombre="Internado en Cirugía" data-creditos="10" data-id="001075" data-prerequisito="allXII,8CRD,EXSM,INB1"></div>
+                <div class="curso" data-curso="INGO" data-nombre="Internado en Ginecología y Obstetricia" data-creditos="10" data-id="001076" data-prerequisito="allXII,8CRD,EXSM,INB1"></div>
             </div>
         </div>
     </div>
 
+    <!-- TODO: ELECTIVOS -->
     <div class="wrapBott">
         <div class="wrapElectivos">
             <h2>Cursos Electivos</h2>
@@ -149,20 +153,20 @@
                 <div class="curso" data-curso="PRAX" data-nombre="Primneros Auxilios (E)" data-creditos="2" data-prerequisito="ANAT"></div>
                 <div class="curso" data-curso="NUMA" data-nombre="Neuropsicorfarmacia y Medicina de Ac." data-creditos="2" data-prerequisito="UCAM"></div>
                 <div class="curso" data-curso="NUSA" data-nombre="Neurociencia en Salud" data-creditos="2" data-prerequisito="MOR4,REGE"></div>
-                <div class="curso" data-curso="MDOC" data-nombre="Medicina Ocupacional" data-creditos="2" data-prerequisito="GERS"></div>
+                <div class="curso" data-curso="MDOC" data-nombre="Medicina Ocupacional" data-creditos="2" data-prerequisito="SALM"></div>
                 <div class="curso" data-curso="MDII" data-nombre="Medicina Interna Interprofesional" data-creditos="2" data-prerequisito="MEI1"></div>
                 <div class="curso" data-curso="MTAC" data-nombre="Medicina Tradicional Alternativa y Complementaria" data-creditos="2" data-prerequisito="FUMI"></div>
                 <div class="curso" data-curso="LISA" data-nombre="Liderazgo en Salud" data-creditos="2" data-prerequisito="DEU1,INM1"></div>
                 <div class="curso" data-curso="INIC" data-nombre="Introducción a la Investigación Cua." data-creditos="2" data-prerequisito="IAD1"></div>
                 <div class="curso" data-curso="IAD1" data-nombre="Introducción al Análisis de Datos I" data-creditos="2" data-prerequisito="ESTG,INTI"></div>
                 <div class="curso" data-curso="IAD2" data-nombre="Introducción al Análisis de Datos II" data-creditos="2" data-prerequisito="IAD1"></div>
-                <div class="curso" data-curso="IRVS" data-nombre="Introducción a las Revisiones Sistemáticas Met-Análisis" data-creditos="2" data-prerequisito="BUSI"></div>
-                <div class="curso" data-curso="HIME" data-nombre="Historia de la Medicina" data-creditos="2" data-prerequisito="INA2"></div>
-                <div class="curso" data-curso="GERS" data-nombre="Gestión de Riesgos en Salud" data-creditos="2" data-prerequisito="GEPS"></div>
+                <div class="curso" data-curso="IRVS" data-nombre="Introducción a las Revisiones Sistemáticas Met-Análisis" data-creditos="2" data-prerequisito="METD"></div>
+                <div class="curso" data-curso="HIME" data-nombre="Historia de la Medicina" data-creditos="2" data-prerequisito="BIOE,RENA"></div>
+                <div class="curso" data-curso="GERS" data-nombre="Gestión de Riesgos en Salud" data-creditos="2" data-prerequisito="ESTG"></div>
                 <div class="curso" data-curso="GEPS" data-nombre="Gestión de Proyectos en Salud" data-creditos="2" data-prerequisito="LISA"></div>
                 <div class="curso" data-curso="FAEP" data-nombre="Farmacología y Epigenética" data-creditos="2" data-prerequisito="GENM"></div>
                 <div class="curso" data-curso="EQTR" data-nombre="Equinoterapia" data-creditos="2" data-prerequisito="INM1"></div>
-                <div class="curso" data-curso="DOBS" data-nombre="Docencia Basada en Simulación" data-creditos="2" data-prerequisito="PCTA"></div>
+                <div class="curso" data-curso="DOBS" data-nombre="Docencia Basada en Simulación" data-creditos="2" data-prerequisito="BIOE"></div>
                 <div class="curso" data-curso="DBAC" data-nombre="Docencia Basada en Análisis de Casos" data-creditos="2" data-prerequisito="PCTA"></div>
                 <div class="curso" data-curso="DEAR" data-nombre="Desarrollo Artísico" data-creditos="2" data-prerequisito="DEU1"></div>
                 <div class="curso" data-curso="BUSI" data-nombre="Búsqueda Sistemática de Información" data-creditos="2" data-prerequisito="IAD2,INIC"></div>
@@ -170,10 +174,11 @@
                 <div class="curso" data-curso="APIN" data-nombre="Aprendizaje Interprofesional" data-creditos="2" data-prerequisito="MEI1"></div>
             </div>
         </div>
+
+        <!-- TODO: REQUISITOS -->
         <div class="wrapRequisitos">
             <div class="condicionesBachiller">
                 <h2>Condiciones Bachiller</h2>
-                <div class="curso" data-curso="TRIN" data-nombre="Trabajo de Investigación" data-creditos="1" data-id="815222" data-prerequisito="allXII,8CRD,EXSM"></div>
                 <div class="idioma">
                     <div class="idiomaTxt"><h3>Nivel de Inglés</h3></div>
                     <div class="idiomaNiveles">
@@ -191,22 +196,38 @@
                     </div>
                 </div>
             </div>
+
             <div class="condicionesEgresado">
                 <h2>Condiciones Egresado</h2>
                 <div class="curso" data-curso="PRCT" data-nombre="Prácticas Pre-Profesionales"></div>
                 <div class="curso" data-curso="ACEX" data-nombre="Actividad Extracurricular"></div>
+            </div>
+
+            <div class="otros">
+                <h2>Otros</h2>
+                <div class="curso" data-curso="TRIN" data-nombre="Trabajo de Investigación" data-creditos="1" data-id="815222" data-prerequisito="allXII,8CRD,EXSM"></div>
                 <div class="curso" data-curso="EXSM" data-nombre="Examen de Suficiencia Médica"></div>
             </div>
         </div>
     </div>
 
-    <div id="ad" class="overlay">
+    <div id="ad1" class="overlay">
         <div class="ad_content">
-            <span class="cerrar_btn" onclick="closeAnuncio()">&times;</span>
+            <span class="cerrar_btn" onclick="cerrarAnuncio(1)">&times;</span>
+            <h2>Actualización:</h2>
+            <p>Se ha actualizado la Malla Curricular, puedes ver los cambios en la pestaña de "Noticias"</p>
+            <button class="btnCerrar" onclick="location.href='news.html'">Ir a Noticias</button>
+            <button class="btnCerrar" onclick="cerrarAnuncio(1)">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="ad2" class="overlay">
+        <div class="ad_content">
+            <span class="cerrar_btn" onclick="cerrarAnuncio(2)">&times;</span>
             <h2>Pagame un cencillito p</h2>
             <img class="img_yape" src="./assets/yape.jpeg" alt="Mi yape ps cholo">
             <p>Me estoy muriendo de hambre</p>
-            <button class="btnCerrar" onclick="closeAnuncio()">Calla muerto de hambre</button>
+            <button class="btnCerrar" onclick="cerrarAnuncio(2)">Calla muerto de hambre</button>
         </div>
     </div>
 
@@ -275,20 +296,34 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
     <script type="module" src="./script.js"></script>
-    <script>
-                // Función para mostrar el anuncio
-        function mostrarAnuncio() {
-            document.getElementById("ad").style.display = "flex";
+    
+<script>
+    // Muestra el primer anuncio al inicio
+    function mostrarPrimerAnuncio() {
+        const ad1 = document.getElementById("ad1");
+        if (ad1) ad1.style.display = "flex";
+    }
+
+    // Cierra el anuncio actual y abre el siguiente si existe
+    function cerrarAnuncio(num) {
+        const anuncioActual = document.getElementById(`ad${num}`);
+        if (anuncioActual) {
+            anuncioActual.style.display = "none";
         }
 
-        // Función para cerrar el anuncio
-        function closeAnuncio() {
-            document.getElementById("ad").style.display = "none";
+        // Si se cerró el 1, se abre el 2
+        if (num === 1) {
+            const siguienteAnuncio = document.getElementById("ad2");
+            if (siguienteAnuncio) {
+                siguienteAnuncio.style.display = "flex";
+            }
         }
+    }
 
-        // Ejecutar el anuncio 2 segundos después de que cargue la página
-        window.onload = function() {
-            setTimeout(mostrarAnuncio, 2000); };
-    </script>
+    // Ejecutar el primer anuncio 2 segundos después de cargar la página
+    window.onload = function() {
+        setTimeout(mostrarPrimerAnuncio, 2000);
+    };
+</script>
 </body>
 </html>
