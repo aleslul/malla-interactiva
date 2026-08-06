@@ -6,13 +6,32 @@
     <title>Noticias</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
+<script>
+    // Lógica del menú hamburguesa responsivo
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        if (menuToggle && navMenu) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('activo');
+            });
+        }
+    });
+</script>
 <body>
     <audio id="easter01" class="easter-audio" src="assets/cagada.mp3" preload="auto"></audio>
     <audio id="easter02" class="easter-audio" src="assets/lenteja.mp3" preload="auto"></audio>
     
     <nav>
         <h1 class="textoNav"><span>Noticias</span></h1>
-        <div class="wrapBtn">
+        <button id="menu-toggle" class="menu-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+        <div id="nav-menu" class="wrapBtn">
             <button class="webs" onclick="location.href='index.html'">Regresar</button>
             <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
             <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
@@ -31,10 +50,38 @@
     </div>
 
     <div class="wrapNews">
-
         <div class="new">
             <div class="news-header">
+                <h2>06/08/2026 - Acceso Móvil y Calculadoras</h2>
+            </div>
+            <div class="news-content">
+                <p>Se han realizado grandes cambios en la pagina:</p>
+                <ul class="listaNews">
+                    <li><b>Acceso móvil:</b>Ahora puedes acceder a la Malla curricular Interactiva desde cualquier dispositivo móvil</li>
+
+                    <li><b>Calculadora de promedio y ponderado</b> Se ha añadido un módulo completo para simular, proyectar y gestionar tu rendimiento académico del semestre. <b>Puedes acceder a este módulo a través del resumen general, en la sección de Notas y Promedio, en la pagina principal</b></li>
+                    <p><b>Calculadora de Curso & Simulador:</b> Ingresa los pesos (%) y notas de tus evaluaciones para conocer tu acumulado actual. Si dejas una nota en blanco, el sistema calculará automáticamente la nota exacta que necesitas sacar en tu examen o trabajo para alcanzar tu nota meta (ej. aprobar con 13).</p> 
+                    <img class="newsImgs" src="./assets/news/06-08-2026-1.webp" alt="Imagen w cff">
+
+                    <p><b>Promedio Ponderado del Ciclo:</b> Obtén un estimado real de tu promedio ponderado del semestre ingresando la nota final de cada materia y sus créditos correspondientes.</p>
+                    <img class="newsImgs" src="./assets/news/06-08-2026-2.webp" alt="Imagen w cff">
+
+
+                    <p><b>Seguimiento y Cursos Guardados:</b> Puedes guardar tus materias para modificarlas clase a clase. Además, si inicias sesión, tus cursos simulados se guardarán en la nube para consultarlos desde cualquier dispositivo.</p>
+                    <img class="newsImgs" src="./assets/news/06-08-2026-3.webp" alt="Imagen w cff">
+
+                    <p><b>Exportación a Excel Formateada:</b> Descarga un reporte visual de tus materias en archivo de Excel (.xls), ordenado en bloques por curso y con fórmulas automáticas para proyectar tus promedios en tu computadora.</p>
+                    <img class="newsImgs" src="./assets/news/06-08-2026-4.webp" alt="Imagen w cff">
+
+                    <li><b>Inicio de Sesión:</b> Al iniciar sesión todo lo que tu hagas se guardará y podras acceder a todos tus cursos guardados y tu progreso en la malla desde cualquier dispositivo iniciando sesión con tu misma cuenta.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="new desplegable">
+            <div class="news-header">
                 <h2>05/08/2026 - Cambio en ciertas funcionalidades</h2>
+                <span class="flecha">▼</span>
             </div>
             <div class="news-content">
                 <p>Se han hecho unos cambios en las funcionalidades de la web:</p>
@@ -161,6 +208,140 @@
         margin: 25px auto;
         border-radius: 8px; 
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+        }
+
+        /* Ocultar el botón hamburguesa en escritorio por defecto */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--texto);
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* ==========================================
+        ADAPTABILIDAD MÓVIL (SMARTPHONES Y TABLETS)
+        ========================================== */
+        @media (max-width: 768px) {
+            
+            /* 1. Navegación y Menú Hamburguesa */
+            nav {
+                height: auto;
+                flex-wrap: wrap; /* Permite que el menú baje a otra línea */
+                padding: 15px 10px;
+                margin-bottom: 20px;
+            }
+
+            /* Ajuste del texto dinámico para evitar desbordes */
+            .textoNav {
+                font-size: 1.6rem; 
+                width: calc(100% - 50px); /* Deja espacio exacto para el botón hamburguesa */
+            }
+
+            .textoNav span {
+                white-space: normal; /* Permite que textos largos bajen de línea */
+                line-height: 1.2;
+            }
+
+            .menu-toggle {
+                display: block; /* Muestra el botón hamburguesa */
+            }
+
+            .wrapBtn {
+                display: none; /* Oculto por defecto en móviles */
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 2px solid var(--secundario);
+            }
+
+            .wrapBtn.activo {
+                display: flex; /* Clase que activa el menú desde JS */
+            }
+
+            .webs, .login-button, #sesion-btn {
+                width: 100%; /* Botones ocupan todo el ancho del menú desplegable */
+            }
+
+            /* 2. Ocultar el botón de resaltado en la Malla (Sin Hover en móviles) */
+            #toggle-resaltado-btn {
+                display: none !important;
+            }
+
+            /* 3. Cabecera principal y Buscador/Filtros */
+            .mainHeader {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+                text-align: center;
+            }
+            .filtros-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .filtros-grupo {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
+            .btn-filtro {
+                flex: 1 1 45%;
+                text-align: center;
+            }
+
+            /* 4. Sección Inferior (Electivos y Requisitos) */
+            .wrapBott {
+                flex-direction: column;
+                padding: 0 10px;
+                gap: 40px;
+                margin: 40px 0;
+            }
+            .wrapElectivos, .wrapRequisitos {
+                width: 100%;
+            }
+            .electivos {
+                grid-template-columns: 1fr;
+            }
+            .condicionesBachiller, .condicionesEgresado, .otrasCondiciones {
+                width: 100%;
+            }
+            .idioma .idiomaNiveles, #segundoIdioma .idiomaNiveles {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .idiomaNiveles .curso:nth-child(1),
+            .idiomaNiveles .curso:nth-child(2), 
+            .idiomaNiveles .curso:nth-child(3),
+            .idiomaNiveles .curso:nth-child(4), 
+            #segundoIdioma .idiomaNiveles .curso:nth-child(2) {
+                border-radius: 8px;
+            }
+
+            /* 5. Vistas secundarias (Calculadora y Noticias) */
+            .calculadoras-grid, .guardados-grid {
+                padding: 20px 10px; /* Evita que las tarjetas se salgan de la pantalla */
+            }
+            .seccion-header {
+                padding: 20px 10px 0 10px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .wrapNews {
+                padding: 0 10px 40px 10px; /* Quita márgenes excesivos laterales */
+            }
+            .new {
+                padding: 15px;
+            }
+            .listaNews {
+                margin-left: 15px;
+            }
         }
     </style>
 

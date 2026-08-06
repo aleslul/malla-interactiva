@@ -45,6 +45,9 @@ const nivelesIngles = {
     INA1: "A1", INA2: "A2", INB1: "B1", INB2: "B2"
 };
 
+let filtroEstadoActual = 'todos';
+let textoBusquedaActual = '';
+
 // ==========================================
 // CLASE CURSO (ORIENTADA A OBJETOS)
 // ==========================================
@@ -235,6 +238,7 @@ function actualizarTodosLosEstados() {
     });
 
     actualizarProgresoGeneral();
+    aplicarFiltros();
 }
 
 // ==========================================
@@ -635,4 +639,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         calendar.render();
     }
+
+    const busquedaInput = document.getElementById('busqueda-input');
+    busquedaInput?.addEventListener('input', (e) => {
+        textoBusquedaActual = e.target.value.toLowerCase().trim();
+        aplicarFiltros();
+    });
+
+    // Eventos de botones de estado
+    const botonesFiltro = document.querySelectorAll('.btn-filtro');
+    botonesFiltro.forEach(btn => {
+        btn.addEventListener('click', () => {
+            botonesFiltro.forEach(b => b.classList.remove('activo'));
+            btn.classList.add('activo');
+
+            filtroEstadoActual = btn.dataset.filtro;
+            aplicarFiltros();
+        });
+    });
 });
+
+function aplicarFiltros() {
+    const creditosElectivos = calcularCreditosElectivos();
+
+    mapaCursos.forEach(cursoObj => {
+        if (!cursoObj.element) return;
+
+        // 1. Coincidencia por texto (Nombre o Código)
+        const coincideTexto = 
+            cursoObj.nombre.toLowerCase().includes(textoBusquedaActual) ||
+            cursoObj.id.toLowerCase().includes(textoBusquedaActual);
+
+        // 2. Coincidencia por estado
+        const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
+        const esBloqueado = faltantes.length > 0 && !cursoObj.completado;
+        const esDisponible = !cursoObj.completado && !esBloqueado;
+
+        let coincideEstado = true;
+        if (filtroEstadoActual === 'disponibles') coincideEstado = esDisponible;
+        if (filtroEstadoActual === 'completados') coincideEstado = cursoObj.completado;
+        if (filtroEstadoActual === 'bloqueados') coincideEstado = esBloqueado;
+
+        // 3. Aplicar o remover clase de ocultado
+        if (coincideTexto && coincideEstado) {
+            cursoObj.element.classList.remove('oculto-filtro');
+        } else {
+            cursoObj.element.classList.add('oculto-filtro');
+        }
+    });
+}

@@ -214,17 +214,53 @@ h1{
 }
 
 /* ==========================================
-   RESUMEN VISUAL / TARJETAS DE PROGRESO (GRID)
+    RESUMEN VISUAL / TARJETAS DE PROGRESO (GRID)
    ========================================== */
 .progreso-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
     background-color: var(--secundario);
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 25px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos de la tarjeta clickeable */
+.card-progreso.card-accion {
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    border: 2px dashed var(--fondo);
+}
+
+.card-progreso.card-accion:hover {
+    transform: translateY(-2px);
+    background-color: var(--complementario);
+}
+.link-calculadora {
+    color: var(--fondo);
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-decoration: none;
+    margin-top: 4px;
+}
+
+.link-calculadora:hover {
+    text-decoration: underline;
+}
+
+/* Adaptabilidad Móvil */
+@media (max-width: 900px) {
+    .progreso-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2x2 en tablets */
+    }
+}
+
+@media (max-width: 550px) {
+    .progreso-grid {
+        grid-template-columns: 1fr; /* 1 columna en celulares */
+    }
 }
 
 .card-progreso {
@@ -284,6 +320,82 @@ h1{
     .progreso-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ==========================================
+    FILTROS DE BÚSQUEDA Y ESTADO
+   ========================================== */
+.filtros-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 25px;
+    width: 100%;
+    height: auto;
+}
+
+.busqueda-container {
+    position: relative;
+    display: inline-block;
+    width: 100%; /* Ancho de tu barra de búsqueda */
+}
+
+.searchIcon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%); /* Centrado vertical perfecto */
+    width: 20px;
+    height: 20px;
+    color: #888888; /* Color gris suave para el icono */
+    pointer-events: none;
+}
+
+#busqueda-input {
+    width: 100%;
+    padding: 10px 10px 10px 35px;
+    border-radius: 10px;
+    border: 2px solid var(--secundario);
+    background-color: var(--primario);
+    color: var(--texto);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+#busqueda-input:focus {
+    border-color: var(--fondo);
+}
+
+.filtros-grupo {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.btn-filtro {
+    border-radius: 8px;
+    border: none;
+    padding: 8px 16px;
+    background-color: var(--secundario);
+    color: var(--fondo);
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-filtro:hover, 
+.btn-filtro.activo {
+    background-color: var(--fondo);
+    color: var(--secundario);
+}
+
+/* Oculta dinámicamente las tarjetas filtradas */
+.curso.oculto-filtro {
+    display: none !important;
 }
 
 .main{
@@ -535,4 +647,139 @@ h1{
 .curso.sucesor p {
     color: #003311 !important;
     font-weight: bold;
+}
+
+
+/* Ocultar el botón hamburguesa en escritorio por defecto */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--texto);
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* ==========================================
+    ADAPTABILIDAD MÓVIL (SMARTPHONES Y TABLETS)
+   ========================================== */
+@media (max-width: 768px) {
+    
+    /* 1. Navegación y Menú Hamburguesa */
+    nav {
+        height: auto;
+        flex-wrap: wrap; /* Permite que el menú baje a otra línea */
+        padding: 15px 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Ajuste del texto dinámico para evitar desbordes */
+    .textoNav {
+        font-size: 1.6rem; 
+        width: calc(100% - 50px); /* Deja espacio exacto para el botón hamburguesa */
+    }
+
+    .textoNav span {
+        white-space: normal; /* Permite que textos largos bajen de línea */
+        line-height: 1.2;
+    }
+
+    .menu-toggle {
+        display: block; /* Muestra el botón hamburguesa */
+    }
+
+    .wrapBtn {
+        display: none; /* Oculto por defecto en móviles */
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid var(--secundario);
+    }
+
+    .wrapBtn.activo {
+        display: flex; /* Clase que activa el menú desde JS */
+    }
+
+    .webs, .login-button, #sesion-btn {
+        width: 100%; /* Botones ocupan todo el ancho del menú desplegable */
+    }
+
+    /* 2. Ocultar el botón de resaltado en la Malla (Sin Hover en móviles) */
+    #toggle-resaltado-btn {
+        display: none !important;
+    }
+
+    /* 3. Cabecera principal y Buscador/Filtros */
+    .mainHeader {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        text-align: center;
+    }
+    .filtros-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .filtros-grupo {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+    .btn-filtro {
+        flex: 1 1 45%;
+        text-align: center;
+    }
+
+    /* 4. Sección Inferior (Electivos y Requisitos) */
+    .wrapBott {
+        flex-direction: column;
+        padding: 0 10px;
+        gap: 40px;
+        margin: 40px 0;
+    }
+    .wrapElectivos, .wrapRequisitos {
+        width: 100%;
+    }
+    .electivos {
+        grid-template-columns: 1fr;
+    }
+    .condicionesBachiller, .condicionesEgresado, .otrasCondiciones {
+        width: 100%;
+    }
+    .idioma .idiomaNiveles, #segundoIdioma .idiomaNiveles {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .idiomaNiveles .curso:nth-child(1),
+    .idiomaNiveles .curso:nth-child(2), 
+    .idiomaNiveles .curso:nth-child(3),
+    .idiomaNiveles .curso:nth-child(4), 
+    #segundoIdioma .idiomaNiveles .curso:nth-child(2) {
+        border-radius: 8px;
+    }
+
+    /* 5. Vistas secundarias (Calculadora y Noticias) */
+    .calculadoras-grid, .guardados-grid {
+        padding: 20px 10px; /* Evita que las tarjetas se salgan de la pantalla */
+    }
+    .seccion-header {
+        padding: 20px 10px 0 10px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .wrapNews {
+        padding: 0 10px 40px 10px; /* Quita márgenes excesivos laterales */
+    }
+    .new {
+        padding: 15px;
+    }
+    .listaNews {
+        margin-left: 15px;
+    }
 }

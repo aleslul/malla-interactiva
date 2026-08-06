@@ -6,12 +6,31 @@
     <title>Malla Interactiva</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
+<script>
+    // Lógica del menú hamburguesa responsivo
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        if (menuToggle && navMenu) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('activo');
+            });
+        }
+    });
+</script>
 <body>
     <audio id="easter01" class="easter-audio" src="assets/cagada.mp3" preload="auto"></audio>
     <audio id="easter02" class="easter-audio" src="assets/lenteja.mp3" preload="auto"></audio>
     <nav>
         <h1 class="textoNav"><span>Bienvenida, Fabiana</span></h1>
-        <div class="wrapBtn">
+        <button id="menu-toggle" class="menu-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+        <div id="nav-menu" class="wrapBtn">
             <button class="webs" onclick="location.href='news.html'">Noticias</button>
             <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
             <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
@@ -47,10 +66,35 @@
                 <span class="card-titulo">Avance de Carrera</span>
                 <span id="porcentaje-texto" class="card-valor">0%</span>
             </div>
+            <div class="card-progreso card-accion" onclick="location.href='./calculadora.html'">
+                <span class="card-titulo">Notas y Promedio</span>
+                <a href="./calculadora.html" class="link-calculadora">Calcula aquí -></a>
+            </div>
             <div class="card-progreso barra-card">
                 <div class="barra-track">
                     <div id="barra-fill" class="barra-fill" style="width: 0%;"></div>
                 </div>
+            </div>
+        </div>
+        <!-- BARRA Y BOTONES DE FILTRO -->
+        <div class="filtros-container">
+
+            <div class="busqueda-container">
+                <svg class="searchIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                <input 
+                    type="text" 
+                    id="busqueda-input" 
+                    placeholder="Busca por nombre o código (ej. Morfofisiología, QUI1)..." 
+                />
+            </div>
+
+            <div class="filtros-grupo">
+                <button class="btn-filtro activo" data-filtro="todos">Todos</button>
+                <button class="btn-filtro" data-filtro="disponibles">Disponibles</button>
+                <button class="btn-filtro" data-filtro="completados">Completados</button>
+                <button class="btn-filtro" data-filtro="bloqueados">Bloqueados</button>
             </div>
         </div>
         <div id="malla-container" class="main"></div>
@@ -92,9 +136,10 @@
         <div class="ad_content">
             <span class="cerrar_btn" onclick="cerrarAnuncio(1)">&times;</span>
             <div class="mensaje">
-                <h2>ACTUALIZACIÓN (05/08/2026)!!!!!!</h2>
-                <p>HOLA COÑO SE HA ACTUALIZAO LA PAGINA COÑO ES <b>SUMAMAMENTE IMPORTANTE</b> QUE LEAS LOS NUEVOS CAMBIOS (DE VERDAD VE A LEERLOS) SOLO PULSA EL BOTON DE ABAJO </p>
-                <p><b>NO TE ROBAREMOS LOS DATOS POR PULSAR EL BOTÓN</b>, REPITO, <b>NO TE ROBAREMOS LOS DATOS POR PULSAR EL BOTÓN.</b></p>
+                <h2>GRAN ACTUALIZACION - 06/08/2026</h2>
+                <p>OSI OSI HE METIDO MAS COSAS OSI OSI <b>ASI QUE VE A LEER LOS CAMBIOS EN LA SECCION DE NOTICIAS</b> PULSA EL BOTON DE ABAJO PARA QUE TE ENTERES DE LAS NUEVAS NOVEDADES Y LE VENDAS TU ALMA AL DIAVLO </p>
+                <p>Con dolor estomacal leve,</p>
+                <p>Yo</p>
             </div>
             <button class="btnCerrar" onclick="location.href='news.html'">Ir a Noticias</button>
             <button class="btnCerrar" onclick="cerrarAnuncio(1)">Cerrar</button>

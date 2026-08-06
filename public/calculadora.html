@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Promedios</title>
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        .calculadoras-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+            padding: 20px 60px;
+        }
+
+        /* Limitado a 3 columnas máximo con adaptación responsive */
+        .guardados-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 20px 60px;
+        }
+
+        @media (max-width: 1100px) {
+            .guardados-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 700px) {
+            .guardados-grid { grid-template-columns: 1fr; }
+        }
+
+        .card-calc {
+            background-color: var(--secundario);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            
+            /* CAMBIO CLAVE: Permite alineación vertical fija */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calc-sub {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .alert-text {
+            margin-top: 35px;
+            text-align: justify;
+        }
+
+        .filas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            
+            /* CAMBIO CLAVE: Se expande para empujar todo lo de abajo al fondo */
+            flex: 1; 
+        }
+
+        .fila-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .fila-input input, .input-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--complementario);
+            background-color: var(--primario);
+            color: var(--texto);
+            font-size: 0.9rem;
+        }
+
+        .input-nombre { flex: 2; min-width: 0; }
+        .input-nota, .input-peso, .input-creditos { flex: 1; min-width: 0; }
+
+        .btn-eliminar {
+            background: #ff5252;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        .btn-secundario {
+            background-color: var(--primario);
+            color: var(--fondo);
+            border: 2px solid var(--fondo);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-guardar {
+            background-color: var(--fondo);
+            color: var(--secundario);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-guardar:hover { opacity: 0.9; }
+
+        .calc-resultado {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid var(--complementario);
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+
+        .nota-final strong {
+            color: var(--fondo);
+            font-size: 1.4rem;
+        }
+
+        /* SECCIÓN DE CURSOS GUARDADOS */
+        .seccion-titulo {
+            font-size: 1.8rem;
+            padding: 20px 60px 0 60px;
+            color: var(--texto);
+        }
+
+        .header-card-saved {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-meta-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Tu código original actualizado */
+        .input-meta-inline {
+            width: 50px;
+            text-align: center;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid var(--complementario);
+            background: var(--primario);
+            color: var(--texto);
+            
+            /* Quita las flechas en Firefox y navegadores modernos */
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Quita las flechas en Chrome, Safari, Edge y Opera */
+        .input-meta-inline::-webkit-outer-spin-button,
+        .input-meta-inline::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .prediccion-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Control de tamaño para los íconos de las alertas */
+        .prediccion-box svg {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            flex-shrink: 0; /* Evita que el ícono se aplaste si el texto es largo */
+        }
+        
+        .icon-svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .prediccion-box.alerta { background-color: #fff8e1; color: #b78103; border-left: 4px solid #ffb300; }
+        .prediccion-box.exito { background-color: #e8f5e9; color: #1b5e20; border-left: 4px solid #2e7d32; }
+        .prediccion-box.peligro { background-color: #ffebee; color: #c62828; border-left: 4px solid #c62828; }
+        .prediccion-box.info { background-color: #e3f2fd; color: #0d47a1; border-left: 4px solid #1976d2; }
+
+        .seccion-header {
+            margin-top: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px 0 60px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .seccion-header .seccion-titulo {
+            padding: 0; /* Anula el padding individual */
+        }
+
+        #exportar-excel-btn {
+            background: #217346;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+
+        /* Ocultar el botón hamburguesa en escritorio por defecto */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--texto);
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* ==========================================
+        ADAPTABILIDAD MÓVIL (SMARTPHONES Y TABLETS)
+        ========================================== */
+        @media (max-width: 768px) {
+            
+            /* 1. Navegación y Menú Hamburguesa */
+            nav {
+                height: auto;
+                flex-wrap: wrap; /* Permite que el menú baje a otra línea */
+                padding: 15px 10px;
+                margin-bottom: 20px;
+            }
+
+            /* Ajuste del texto dinámico para evitar desbordes */
+            .textoNav {
+                font-size: 1.6rem; 
+                width: calc(100% - 50px); /* Deja espacio exacto para el botón hamburguesa */
+            }
+
+            .textoNav span {
+                white-space: normal; /* Permite que textos largos bajen de línea */
+                line-height: 1.2;
+            }
+
+            .menu-toggle {
+                display: block; /* Muestra el botón hamburguesa */
+            }
+
+            .wrapBtn {
+                display: none; /* Oculto por defecto en móviles */
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 2px solid var(--secundario);
+            }
+
+            .wrapBtn.activo {
+                display: flex; /* Clase que activa el menú desde JS */
+            }
+
+            .webs, .login-button, #sesion-btn {
+                width: 100%; /* Botones ocupan todo el ancho del menú desplegable */
+            }
+
+            /* 2. Ocultar el botón de resaltado en la Malla (Sin Hover en móviles) */
+            #toggle-resaltado-btn {
+                display: none !important;
+            }
+
+            /* 3. Cabecera principal y Buscador/Filtros */
+            .mainHeader {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+                text-align: center;
+            }
+            .filtros-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .filtros-grupo {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
+            .btn-filtro {
+                flex: 1 1 45%;
+                text-align: center;
+            }
+
+            /* 4. Sección Inferior (Electivos y Requisitos) */
+            .wrapBott {
+                flex-direction: column;
+                padding: 0 10px;
+                gap: 40px;
+                margin: 40px 0;
+            }
+            .wrapElectivos, .wrapRequisitos {
+                width: 100%;
+            }
+            .electivos {
+                grid-template-columns: 1fr;
+            }
+            .condicionesBachiller, .condicionesEgresado, .otrasCondiciones {
+                width: 100%;
+            }
+            .idioma .idiomaNiveles, #segundoIdioma .idiomaNiveles {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .idiomaNiveles .curso:nth-child(1),
+            .idiomaNiveles .curso:nth-child(2), 
+            .idiomaNiveles .curso:nth-child(3),
+            .idiomaNiveles .curso:nth-child(4), 
+            #segundoIdioma .idiomaNiveles .curso:nth-child(2) {
+                border-radius: 8px;
+            }
+
+            /* 5. Vistas secundarias (Calculadora y Noticias) */
+            .calculadoras-grid, .guardados-grid {
+                padding: 20px 10px; /* Evita que las tarjetas se salgan de la pantalla */
+            }
+            .seccion-header {
+                padding: 20px 10px 0 10px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .wrapNews {
+                padding: 0 10px 40px 10px; /* Quita márgenes excesivos laterales */
+            }
+            .new {
+                padding: 15px;
+            }
+            .listaNews {
+                margin-left: 15px;
+            }
+        }
+    </style>
+</head>
+
+<script>
+    // Lógica del menú hamburguesa responsivo
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        if (menuToggle && navMenu) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('activo');
+            });
+        }
+    });
+</script>
+<body>
+    <nav>
+        <h1 class="textoNav"><span>Calculadora de Promedios</span></h1>
+        <button id="menu-toggle" class="menu-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+        <div id="nav-menu" class="wrapBtn">
+            <button class="webs" onclick="location.href='index.html'">Regresar</button>
+            <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
+            <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
+            <button class="login-button" id="login-btn">Iniciar Sesión</button>
+        </div>
+    </nav>
+
+    <!-- PANEL PRINCIPAL DE CALCULADORAS -->
+    <div class="calculadoras-grid">
+
+        <!-- CALCULADORA RÁPIDA / CONVERTIBLE -->
+        <div class="card-calc">
+            <h2>Calculadora de Curso</h2>
+            <p class="calc-sub">Prueba tus notas o guárdalo como seguimiento</p>
+            
+            <div id="evaluaciones-rapidas-list" class="filas-container"></div>
+
+            <div class="calc-acciones">
+                <button id="add-eval-rapida-btn" class="btn-secundario">+ Agregar Evaluación</button>
+            </div>
+
+            <div class="calc-resultado">
+                <div class="info-peso">
+                    <span>Peso Total: </span>
+                    <strong id="peso-rapido-texto">0%</strong>
+                </div>
+                <div class="nota-final">
+                    <span>Acumulado: </span>
+                    <strong id="nota-rapida-texto">0.00</strong>
+                </div>
+            </div>
+
+            <button id="guardar-curso-btn" class="btn-guardar">Guardar Curso</button>
+        </div>
+
+        <!-- CALCULADORA PONDERADO CICLO -->
+        <div class="card-calc">
+            <h2>Promedio Ponderado del Ciclo</h2>
+            <p class="calc-sub">Calcula el ponderado estimado de tu semestre</p>
+
+            <div id="cursos-list" class="filas-container"></div>
+
+            <div class="calc-acciones">
+                <button id="add-curso-btn" class="btn-secundario">+ Agregar Curso</button>
+            </div>
+
+            <div class="calc-resultado">
+                <div class="info-peso">
+                    <span>Créditos: </span>
+                    <strong id="creditos-totales-texto">0</strong>
+                </div>
+                <div class="nota-final">
+                    <span>Ponderado Ciclo Lectivo: </span>
+                    <strong id="ponderado-ciclo-texto">0.00</strong>
+                </div>
+            </div>
+            <p class="calc-sub alert-text"><b>Atención:</b> Este es el Ponderado de Ciclo Lectivo, el Ponderado Final va a variar debido a asistencias o sanciones reglamentarias.</p>
+
+        </div>
+    </div>   
+
+    <!-- SECCIÓN DE CURSOS SEGUIDOS Y PREDICCIÓN -->
+    <div class="seccion-header">
+        <h2 class="seccion-titulo">Cursos Guardados y Predicciones</h2>
+        <button id="exportar-excel-btn" class="btn-guardar" style="width: auto; margin: 0;">Exportar a Excel</button>
+    </div>
+    <div id="cursos-guardados-grid" class="guardados-grid">
+        <!-- Tarjetas dinámicas generadas desde JS -->
+    </div>
+
+    <!-- TODO: script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTHGzByR6Vi90xSPLuXklzVi8mLMcsP0g",
+            authDomain: "mallainteractiva-bd28f.firebaseapp.com",
+            projectId: "mallainteractiva-bd28f",
+            storageBucket: "mallainteractiva-bd28f.firebasestorage.app",
+            messagingSenderId: "321124874020",
+            appId: "1:321124874020:web:0b00fd1f53fa1bd4f725b1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        
+        let userUID = null;
+        // Quita la palabra 'let' si ya la tenías declarada abajo, o déjala aquí y bórrala de más abajo
+        let cursosSimulados = JSON.parse(localStorage.getItem('cursosSimulados')) || [];
+
+        // Función ayudante para guardar en la nube
+        async function sincronizarConFirebase() {
+            if (userUID) {
+                try {
+                    await setDoc(doc(db, "usuarios", userUID), {
+                        cursosSimulados: cursosSimulados
+                    }, { merge: true });
+                } catch (e) {
+                    console.error("Error al guardar en Firebase:", e);
+                }
+            }
+        }
+
+        // Evento de Iniciar Sesión
+        document.getElementById('login-btn')?.addEventListener('click', () => {
+            signInWithPopup(auth, provider).then(async (result) => {
+                userUID = result.user.uid;
+                
+                const loginBtn = document.getElementById('login-btn');
+                if (loginBtn) loginBtn.style.display = 'none'; // Ocultamos el botón al logearse
+
+                // Descargar datos de la nube
+                const docRef = doc(db, "usuarios", userUID);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Si el usuario ya tiene cursos guardados en la nube, los descargamos
+                    if (data.cursosSimulados && data.cursosSimulados.length > 0) {
+                        cursosSimulados = data.cursosSimulados;
+                        localStorage.setItem('cursosSimulados', JSON.stringify(cursosSimulados));
+                        renderCursosGuardados();
+                    } 
+                    // Si la nube está vacía pero hay cursos locales, los subimos a la nube
+                    else if (cursosSimulados.length > 0) {
+                        sincronizarConFirebase();
+                    }
+                }
+            }).catch(console.error);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCalcRapida();
+            initCalcPonderado();
+            renderCursosGuardados();
+        });
+
+        const icons = {
+            check: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>`,
+            alert: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>`,
+            info: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>`,
+            danger: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
+            </svg>`
+        };
+
+        // ==========================================
+        // MOTOR REUTILIZABLE (FUNCIÓN DRY DE CÁLCULO)
+        // ==========================================
+        function calcularEstadoEvaluaciones(evaluaciones, notaObjetivo = 13) {
+            let acumulado = 0;
+            let sumaPesos = 0;
+            let pendientes = [];
+
+            evaluaciones.forEach(ev => {
+                sumaPesos += ev.peso;
+                if (ev.nota !== null && ev.nota !== undefined && ev.nota !== '') {
+                    acumulado += parseFloat(ev.nota) * (ev.peso / 100);
+                } else {
+                    pendientes.push(ev);
+                }
+            });
+
+            return { acumulado, sumaPesos, pendientes, notaObjetivo };
+        }
+
+        function generarHtmlPrediccion(estado) {
+            const { acumulado, pendientes, notaObjetivo } = estado;
+
+            if (pendientes.length === 1) {
+                const pend = pendientes[0];
+                const puntosFaltantes = notaObjetivo - acumulado;
+                const notaNecesaria = (puntosFaltantes / (pend.peso / 100));
+
+                if (notaNecesaria <= 0) {
+                    return { clase: 'exito', html: `${icons.check} <span>¡Meta superada! Tu acumulado (${acumulado.toFixed(2)}) ya aprueba el curso.</span>` };
+                } else if (notaNecesaria > 20) {
+                    return { clase: 'peligro', html: `${icons.danger} <span>Necesitas <strong>${notaNecesaria.toFixed(2)}</strong> en <i>${pend.nombre}</i> para alcanzar la meta de ${notaObjetivo}.</span>` };
+                } else {
+                    return { clase: 'alerta', html: `${icons.alert} <span>Necesitas sacar <strong>${notaNecesaria.toFixed(2)}</strong> en <i>${pend.nombre}</i> (${pend.peso}%) para tu meta de <strong>${notaObjetivo}</strong>.</span>` };
+                }
+            } else if (pendientes.length > 1) {
+                const puntosFaltantes = Math.max(0, notaObjetivo - acumulado);
+                return { clase: 'info', html: `${icons.info} <span>Tienes ${pendientes.length} evaluaciones pendientes. Te faltan <strong>${puntosFaltantes.toFixed(2)} pts</strong> para tu meta de ${notaObjetivo}.</span>` };
+            } else {
+                const esAprobado = acumulado >= notaObjetivo;
+                return { 
+                    clase: esAprobado ? 'exito' : 'peligro', 
+                    html: esAprobado 
+                        ? `${icons.check} <span>Promedio Final: <strong>${acumulado.toFixed(2)}</strong> (Alcanzado)</span>` 
+                        : `${icons.danger} <span>Promedio Final: <strong>${acumulado.toFixed(2)}</strong> (Bajo la meta)</span>` 
+                };
+            }
+        }
+
+        // ==========================================
+        // 1. CALCULADORA RÁPIDA / CONVERTIBLE
+        // ==========================================
+        function initCalcRapida() {
+            const list = document.getElementById('evaluaciones-rapidas-list');
+            const addBtn = document.getElementById('add-eval-rapida-btn');
+            const guardarBtn = document.getElementById('guardar-curso-btn');
+
+            const plantilla = [
+                { nombre: 'Evaluación Continua 1', nota: 15, peso: 18 },
+                { nombre: 'Evaluación Parcial', nota: 16, peso: 20 },
+                { nombre: 'Evaluación Final', nota: '', peso: 25 }
+            ];
+
+            plantilla.forEach(i => crearFilaInput(list, i.nombre, i.nota, i.peso, calcularRapida));
+            addBtn?.addEventListener('click', () => crearFilaInput(list, '', '', '', calcularRapida));
+            guardarBtn?.addEventListener('click', guardarCursoDesdeRapida);
+
+            calcularRapida();
+        }
+
+        function crearFilaInput(container, nombre = '', nota = '', peso = '', callback) {
+            const row = document.createElement('div');
+            row.className = 'fila-input';
+            row.innerHTML = `
+                <input type="text" placeholder="Evaluación" class="input-nombre" value="${nombre}">
+                <input type="number" placeholder="Nota" class="input-nota" min="0" max="20" step="0.1" value="${nota !== null ? nota : ''}">
+                <input type="number" placeholder="Peso %" class="input-peso" min="0" max="100" value="${peso}">
+                <button class="btn-eliminar">✕</button>
+            `;
+            row.querySelectorAll('input').forEach(i => i.addEventListener('input', callback));
+            row.querySelector('.btn-eliminar').addEventListener('click', () => { row.remove(); callback(); });
+            container.appendChild(row);
+        }
+
+        function calcularRapida() {
+            const evaluaciones = obtenerEvaluacionesDeContenedor('evaluaciones-rapidas-list');
+            const estado = calcularEstadoEvaluaciones(evaluaciones);
+
+            const elPeso = document.getElementById('peso-rapido-texto');
+            if (elPeso) {
+                elPeso.textContent = `${estado.sumaPesos}%`;
+                elPeso.style.color = estado.sumaPesos === 100 ? '#00E676' : '#FF5252';
+            }
+            document.getElementById('nota-rapida-texto').textContent = estado.acumulado.toFixed(2);
+        }
+
+        function obtenerEvaluacionesDeContenedor(containerId) {
+            const filas = document.querySelectorAll(`#${containerId} .fila-input`);
+            const evs = [];
+            filas.forEach(row => {
+                const nombre = row.querySelector('.input-nombre').value || 'Evaluación';
+                const notaVal = row.querySelector('.input-nota').value;
+                const peso = parseFloat(row.querySelector('.input-peso').value) || 0;
+                evs.push({
+                    nombre,
+                    nota: notaVal !== '' ? parseFloat(notaVal) : null,
+                    peso
+                });
+            });
+            return evs;
+        }
+
+        function guardarCursoDesdeRapida() {
+            const nombreCurso = prompt("Ingresa el nombre del curso a guardar (ej. Morfofisiología I):");
+            if (!nombreCurso || !nombreCurso.trim()) return;
+
+            const evaluaciones = obtenerEvaluacionesDeContenedor('evaluaciones-rapidas-list');
+
+            const nuevoCurso = {
+                id: `curso_${Date.now()}`,
+                nombre: nombreCurso.trim(),
+                notaObjetivo: 13,
+                evaluaciones
+            };
+
+            cursosSimulados.push(nuevoCurso);
+            localStorage.setItem('cursosSimulados', JSON.stringify(cursosSimulados));
+            sincronizarConFirebase();
+            renderCursosGuardados();
+        }
+
+        // ==========================================
+        // 2. RENDERING Y MANEJO DE CURSOS GUARDADOS
+        // ==========================================
+        function renderCursosGuardados() {
+            const grid = document.getElementById('cursos-guardados-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (cursosSimulados.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; opacity:0.7;">No tienes cursos guardados aún. Usa la calculadora superior para agregar uno.</p>';
+                return;
+            }
+
+            cursosSimulados.forEach(curso => {
+                const card = document.createElement('div');
+                card.className = 'card-calc';
+                card.id = `card-${curso.id}`;
+
+                // Se agregó el bloque .calc-resultado antes de .prediccion-box
+                card.innerHTML = `
+                    <div class="header-card-saved">
+                        <h3>${curso.nombre}</h3>
+                        <div class="card-meta-tag">
+                            <label>Nota Deseada:</label>
+                            <input type="number" class="input-meta-inline" value="${curso.notaObjetivo}" min="0" max="20" />
+                            <button class="btn-eliminar btn-del-curso">Borrar Curso</button>
+                        </div>
+                    </div>
+                    <div class="filas-container list-evals-saved"></div>
+                    <button class="btn-secundario btn-add-eval">+ Agregar Evaluación</button>
+                    
+                    <div class="calc-resultado">
+                        <div class="info-peso">
+                            <span>Peso Total: </span>
+                            <strong class="peso-guardado-texto">0%</strong>
+                        </div>
+                        <div class="nota-final">
+                            <span>Acumulado: </span>
+                            <strong class="acumulado-guardado-texto">0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="prediccion-box"></div>
+                `;
+
+                const listContainer = card.querySelector('.list-evals-saved');
+                
+                // Cargar evaluaciones del curso
+                curso.evaluaciones.forEach(ev => {
+                    crearFilaInput(listContainer, ev.nombre, ev.nota, ev.peso, () => actualizarCursoGuardado(curso.id));
+                });
+
+                // Listeners de la tarjeta
+                card.querySelector('.input-meta-inline').addEventListener('input', () => actualizarCursoGuardado(curso.id));
+                card.querySelector('.btn-add-eval').addEventListener('click', () => {
+                    crearFilaInput(listContainer, '', '', '', () => actualizarCursoGuardado(curso.id));
+                    actualizarCursoGuardado(curso.id);
+                });
+                card.querySelector('.btn-del-curso').addEventListener('click', () => eliminarCursoGuardado(curso.id));
+
+                grid.appendChild(card);
+                actualizarCursoGuardado(curso.id);
+            });
+        }
+
+        function actualizarCursoGuardado(cursoId) {
+            const card = document.getElementById(`card-${cursoId}`);
+            if (!card) return;
+
+            const metaVal = parseFloat(card.querySelector('.input-meta-inline').value) || 13;
+            const evs = obtenerEvaluacionesDeContenedorDirecto(card);
+
+            // Actualizar arreglo en memoria
+            const idx = cursosSimulados.findIndex(c => c.id === cursoId);
+            if (idx >= 0) {
+                cursosSimulados[idx].notaObjetivo = metaVal;
+                cursosSimulados[idx].evaluaciones = evs;
+                localStorage.setItem('cursosSimulados', JSON.stringify(cursosSimulados));
+                sincronizarConFirebase();
+            }
+
+            // Calcular los estados matemáticos
+            const estado = calcularEstadoEvaluaciones(evs, metaVal);
+
+            // 1. Actualizar el Acumulado y el Peso Total en la tarjeta
+            const elPeso = card.querySelector('.peso-guardado-texto');
+            const elAcumulado = card.querySelector('.acumulado-guardado-texto');
+            
+            if (elPeso) {
+                elPeso.textContent = `${estado.sumaPesos}%`;
+                elPeso.style.color = estado.sumaPesos === 100 ? '#00E676' : '#FF5252';
+            }
+            if (elAcumulado) {
+                elAcumulado.textContent = estado.acumulado.toFixed(2);
+            }
+
+            // 2. Recalcular predicción visual (Alertas)
+            const res = generarHtmlPrediccion(estado);
+            const box = card.querySelector('.prediccion-box');
+            box.className = `prediccion-box ${res.clase}`;
+            box.innerHTML = res.html;
+        }
+
+        function obtenerEvaluacionesDeContenedorDirecto(cardElement) {
+            const filas = cardElement.querySelectorAll('.list-evals-saved .fila-input');
+            const evs = [];
+            filas.forEach(row => {
+                const nombre = row.querySelector('.input-nombre').value || 'Evaluación';
+                const notaVal = row.querySelector('.input-nota').value;
+                const peso = parseFloat(row.querySelector('.input-peso').value) || 0;
+                evs.push({
+                    nombre,
+                    nota: notaVal !== '' ? parseFloat(notaVal) : null,
+                    peso
+                });
+            });
+            return evs;
+        }
+
+        function eliminarCursoGuardado(cursoId) {
+            if (!confirm("¿Deseas borrar este curso guardado?")) return;
+            cursosSimulados = cursosSimulados.filter(c => c.id !== cursoId);
+            localStorage.setItem('cursosSimulados', JSON.stringify(cursosSimulados));
+            sincronizarConFirebase();
+            renderCursosGuardados();
+        }
+
+        // ==========================================
+        // 3. PROMEDIO PONDERADO DEL CICLO
+        // ==========================================
+        function initCalcPonderado() {
+            const list = document.getElementById('cursos-list');
+            const addBtn = document.getElementById('add-curso-btn');
+
+            const plantilla = [
+                { nombre: 'Morfofisiología I', nota: 16, creditos: 6 },
+                { nombre: 'Estadística General', nota: 15, creditos: 4 }
+            ];
+
+            plantilla.forEach(c => crearFilaCurso(list, c.nombre, c.nota, c.creditos));
+            addBtn?.addEventListener('click', () => crearFilaCurso(list, '', '', ''));
+            calcularPonderado();
+        }
+
+        function crearFilaCurso(container, nombre = '', nota = '', creditos = '') {
+            const row = document.createElement('div');
+            row.className = 'fila-input';
+            row.innerHTML = `
+                <input type="text" placeholder="Curso" class="input-nombre" value="${nombre}">
+                <input type="number" placeholder="Nota Final" class="input-nota" min="0" max="20" step="0.1" value="${nota}">
+                <input type="number" placeholder="Créditos" class="input-creditos" min="1" max="10" value="${creditos}">
+                <button class="btn-eliminar">✕</button>
+            `;
+            row.querySelectorAll('input').forEach(i => i.addEventListener('input', calcularPonderado));
+            row.querySelector('.btn-eliminar').addEventListener('click', () => { row.remove(); calcularPonderado(); });
+            container.appendChild(row);
+        }
+
+        function calcularPonderado() {
+            const filas = document.querySelectorAll('#cursos-list .fila-input');
+            let puntosTotales = 0, creditosTotales = 0;
+            filas.forEach(row => {
+                const nota = parseFloat(row.querySelector('.input-nota').value) || 0;
+                const creditos = parseFloat(row.querySelector('.input-creditos').value) || 0;
+                puntosTotales += nota * creditos;
+                creditosTotales += creditos;
+            });
+            const ponderado = creditosTotales > 0 ? (puntosTotales / creditosTotales) : 0;
+            document.getElementById('creditos-totales-texto').textContent = creditosTotales;
+            document.getElementById('ponderado-ciclo-texto').textContent = ponderado.toFixed(2);
+        }
+
+        function exportarCursosExcel() {
+            if (!cursosSimulados || cursosSimulados.length === 0) {
+                alert("No tienes cursos guardados para exportar.");
+                return;
+            }
+
+            // 1. Estructuramos el documento como un XML/HTML que Excel entiende nativamente
+            let excelHTML = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:x="urn:schemas-microsoft-com:office:excel"
+                xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8">
+                <!--[if gte mso 9]>
+                <xml>
+                    <x:ExcelWorkbook>
+                        <x:ExcelWorksheets>
+                            <x:ExcelWorksheet>
+                                <x:Name>Mis Promedios</x:Name>
+                                <x:WorksheetOptions>
+                                    <x:DisplayGridlines/>
+                                </x:WorksheetOptions>
+                            </x:ExcelWorksheet>
+                        </x:ExcelWorksheets>
+                    </x:ExcelWorkbook>
+                </xml>
+                <![endif]-->
+                <style>
+                    /* Paleta de colores basada en tu imagen */
+                    .header-curso { background-color: #f8cbad; color: #e26b6b; font-weight: bold; text-align: center; text-transform: uppercase; border: 1px solid #f8cbad; }
+                    .header-col { background-color: #f8cbad; color: #FFFFFF; font-weight: bold; text-align: center; border: 1px solid #f8cbad; }
+                    .celda-eval { background-color: #f8cbad; color: #FFFFFF; font-weight: bold; text-align: center; text-transform: uppercase; border: 1px solid #fbc7a7; }
+                    .celda-valor { text-align: center; border: 1px solid #f4b084; }
+                    .celda-total-lbl { font-weight: bold; text-align: center; border: 1px solid #f8cbad; }
+                    .celda-total-val { background-color: #f8cbad; color: #000000; text-align: center; border: 1px solid #f8cbad; }
+                </style>
+            </head>
+            <body>
+                <table>
+            `;
+
+            let currentRow = 1; // Excel empieza en la fila 1
+
+            cursosSimulados.forEach(curso => {
+                // Cabecera del bloque del curso
+                excelHTML += `
+                    <tr>
+                        <td class="header-curso">${curso.nombre}</td>
+                        <td class="header-col">%</td>
+                        <td class="header-col">NOTAS</td>
+                    </tr>
+                `;
+                currentRow++;
+
+                let startRow = currentRow; // Fila donde inician las notas de este curso
+                let evalRows = [];
+
+                // Filas de evaluaciones
+                curso.evaluaciones.forEach(ev => {
+                    let notaVal = (ev.nota !== null && ev.nota !== undefined && ev.nota !== '') ? ev.nota : '';
+                    
+                    // Usamos x:num para forzar a Excel a entenderlo como número y no como texto
+                    let celdaNota = notaVal !== '' 
+                        ? `<td class="celda-valor" x:num="${notaVal}">${notaVal}</td>` 
+                        : `<td class="celda-valor"></td>`;
+                    
+                    excelHTML += `
+                    <tr>
+                        <td class="celda-eval">${ev.nombre}</td>
+                        <td class="celda-valor" x:num="${(ev.peso || 0) / 100}" style="mso-number-format:'0%';">${ev.peso || 0}%</td>
+                        ${celdaNota}
+                    </tr>
+                    `;
+                    evalRows.push(currentRow);
+                    currentRow++;
+                });
+
+                // Fórmulas matemáticas universales para que funcionen tanto en Excel en inglés como en español
+                // Suma simple (Ej: =B2+B3+B4)
+                let formulaPeso = "=" + evalRows.map(r => `B${r}`).join("+");
+                // Suma producto directo, aprovechando que Excel convierte el % a decimal (Ej: =B2*C2+B3*C3)
+                let formulaNota = "=" + evalRows.map(r => `B${r}*C${r}`).join("+");
+
+                // Fila de TOTALES
+                excelHTML += `
+                    <tr>
+                        <td class="celda-total-lbl">TOTAL</td>
+                        <td class="celda-total-val" x:fmla="${formulaPeso}" style="mso-number-format:'0%';"></td>
+                        <td class="celda-total-val" x:fmla="${formulaNota}" style="mso-number-format:'0.0000';"></td>
+                    </tr>
+                    <tr><td></td><td></td><td></td></tr> <!-- Espacio entre cursos -->
+                `;
+                currentRow += 2; // Sumamos la fila de total y la fila en blanco
+            });
+
+            excelHTML += `
+                </table>
+            </body>
+            </html>
+            `;
+
+            // 2. Descargamos el archivo como formato XLS
+            const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Mis_Promedios_${new Date().toISOString().slice(0,10)}.xls`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Agregar el listener dentro de DOMContentLoaded:
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... tus funciones anteriores (initCalcRapida, initCalcPonderado, renderCursosGuardados)
+            
+            document.getElementById('exportar-excel-btn')?.addEventListener('click', exportarCursosExcel);
+        });
+    </script>
+</body>
+</html>
