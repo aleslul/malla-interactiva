@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +9,17 @@
 <body>
     <audio id="easter01" class="easter-audio" src="assets/cagada.mp3" preload="auto"></audio>
     <audio id="easter02" class="easter-audio" src="assets/lenteja.mp3" preload="auto"></audio>
+    
     <nav>
         <h1 class="textoNav"><span>Noticias</span></h1>
         <div class="wrapBtn">
-            <button class="webs" onclick="location.href='index.html'" >Regresar</button>
+            <button class="webs" onclick="location.href='index.html'">Regresar</button>
             <button class="webs" onclick="window.open('https://miportal.cientifica.edu.pe/login', '_blank')">Mi Portal</button>
             <button class="webs" onclick="window.open('https://cientificavirtual.cientifica.edu.pe/login/canvas', '_blank')">Canvas</button>
             <button class="login-button" id="login-btn">Iniciar Sesión</button>
         </div>
     </nav>
+
     <div id="tooltip" style="
         display: none; 
         position: absolute; 
@@ -27,47 +29,147 @@
         box-shadow: 5px 5px 10px rgba(0,0,0,0.5); 
         z-index: 999;">
     </div>
+
     <div class="wrapNews">
-        <h2>31/07/2026</h2>
-        <p>La malla curricular se ha actualizado con ellas algunos pre-requisitos de los cuales lo más importante es:</p>
-        <ul class="listaNews">
-            <li>
-                <b>Inglés:</b> Ahora es necesario tener el nivel <b>A2</b> de ingles a partir del <b>6to ciclo</b> y nivel <b>B1</b> a partir del <b>8vo ciclo</b>, para aplicar al Bachiller deberás tener nivel de ingles B2.
-            </li>
-            <li>
-                <b>Examen de Suficiencia</b> El examen de suficiencia médica es necesaria solamente para los cursos del 13vo ciclo, pero no es necesario para Bachiller, se movió a Otros.
-            </li>
-            <li>
-                <b>Trabajo de Investigación:</b> Ahora el trabajo de investigación no es necesaria para el Bachiller
-            </li>
-        </ul>
+
+        <div class="new">
+            <div class="news-header">
+                <h2>05/08/2026 - Cambio en ciertas funcionalidades</h2>
+            </div>
+            <div class="news-content">
+                <p>Se han hecho unos cambios en las funcionalidades de la web:</p>
+                <ul class="listaNews">
+                    <li><b>Pre-requisitos</b> Al pasar el mouse por encima de un cursos <b>solo te mostrará </b> los cursos que te <b>faltan</b> para desbloquear dicho curso, si quieres acceder a los pre-requisitos completos puedes hacerlo pulsando <b>click derecho</b></li>
+                    <img class="newsImgs" src="./assets/news/05-08-2026-1.webp" alt="Imagen w cff">
+                    
+                    <li><b>Desmarcado en cascada:</b> Se corrigió un error por el cual los cursos avanzados permanecían aprobados aunque desmarcaras sus prerrequisitos.</li>
+
+                    <li><b>Cambios visuales leves:</b> Se corrigieron algunos cambios visuales leves que no cambian el diseño por completo</li>
+                </ul>
+                <p>Ayuda, keiko me tiene encerrado y me va a electrocutar, para que eso no pase porfavor rellena este <a href="https://youtu.be/6_hl8AB7Uf0?si=qDxxYxCbiqz-_blg" target="_blank">formulario</a></p>
+            </div>
+        </div>
+
+        <div class="new desplegable">
+            <div class="news-header">
+                <h2>31/07/2026 - Actualización de Malla</h2>
+                <span class="flecha">▼</span>
+            </div>
+            <div class="news-content">
+                <p>La malla curricular se ha actualizado con ella algunos pre-requisitos de los cuales lo más importante es:</p>
+                <ul class="listaNews">
+                    <li>
+                        <b>Inglés:</b> Ahora es necesario tener el nivel <b>A2</b> de inglés a partir del <b>6to ciclo</b> y nivel <b>B1</b> a partir del <b>8vo ciclo</b>, para aplicar al Bachiller deberás tener nivel de inglés B2.
+                    </li>
+                    <li>
+                        <b>Examen de Suficiencia:</b> El examen de suficiencia médica es necesario solamente para los cursos del 13vo ciclo.
+                    </li>
+                    <li>
+                        <b>Trabajo de Investigación:</b> Ahora el trabajo de investigación no es necesario para el Bachiller.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
     </div>
+
+    <style>
+        .wrapNews {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 0 80px 40px 80px;
+        }
+
+        .new {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--secundario);
+            border-radius: 12px;
+            padding: 20px 30px;
+            transition: all 0.3s ease;
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .listaNews {
+            margin-left: 40px;
+            margin-top: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--fondo);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* ESTILOS DE LOS DESPLEGABLES */
+        .new.desplegable .news-header {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .new.desplegable .news-header:hover h2 {
+            opacity: 0.8;
+        }
+
+        .new.desplegable .flecha {
+            font-size: 1.5rem;
+            color: var(--fondo);
+            transition: transform 0.3s ease;
+        }
+
+        /* Ocultar contenido por defecto en noticias desplegables */
+        .new.desplegable .news-content {
+            display: none;
+            margin-top: 15px;
+        }
+
+        /* Estado ABIERTO */
+        .new.desplegable.abierto .news-content {
+            display: block;
+        }
+
+        .new.desplegable.abierto .flecha {
+            transform: rotate(180deg);
+        }
+
+        .newsImgs {
+        display: block;
+        max-width: 100%; 
+        max-height: 350px; 
+        height: auto;
+        margin: 25px auto;
+        border-radius: 8px; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+        }
+    </style>
+
+    <script>
+        // Lógica automática para cualquier elemento con las clases .new.desplegable
+        document.addEventListener('DOMContentLoaded', () => {
+            const desplegables = document.querySelectorAll('.new.desplegable .news-header');
+            
+            desplegables.forEach(header => {
+                header.addEventListener('click', () => {
+                    const contenedorNoticia = header.closest('.new');
+                    contenedorNoticia.classList.toggle('abierto');
+                });
+            });
+        });
+    </script>
 </body>
-
-<style>
-    .wrapNews {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        padding-left: 80px;
-        padding-right: 80px;
-        padding-bottom: 20px;
-    }
-    .listaNews {
-        margin-left: 40px;
-    }
-
-    li {
-        margin-bottom: 8px;
-        font-size: 1.3rem;
-    }
-
-    h2 {
-        font-size: 2.1rem;
-    }
-
-    p {
-        font-size: 1.3rem;
-    }
-</style>
 </html>

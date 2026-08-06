@@ -1,10 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { mallaData } from "./mallaData.js";
 
-
-
-// DATABASE
+// DATABASE FIREBASE CONFIG
 const firebaseConfig = {
     apiKey: "AIzaSyDTHGzByR6Vi90xSPLuXklzVi8mLMcsP0g",
     authDomain: "mallainteractiva-bd28f.firebaseapp.com",
@@ -14,370 +13,284 @@ const firebaseConfig = {
     appId: "1:321124874020:web:0b00fd1f53fa1bd4f725b1"
 };
 
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 const jsConfetti = new JSConfetti();
+
 let userUID = null;
-let cursosCompletados = JSON.parse(localStorage.getItem('cursosCompletados')) || [];
+let cursosCompletados = new Set(JSON.parse(localStorage.getItem('cursosCompletados')) || []);
+const mapaCursos = new Map(); // Instancias de clase Curso
 
 const nivelesIngles = {
-    INA1: "A1",
-    INA2: "A2",
-    INB1: "B1",
-    INB2: "B2"
+    INA1: "A1", INA2: "A2", INB1: "B1", INB2: "B2"
 };
 
-const mensajesNav = [
-    "Bienvenida, Fabiana",
-    "¿Lista para estudiar?",
-    "Malla Interactiva",
-    "Holas bolas :D",
-    "RECOÑOOOOOO",
-    "No te duermas",
-    "🎶 La vida es una lenteja 🎶",
-    "¿Qué tal tu día?",
-    "So pechicchibol 🥀",
-];
-
-const nav = document.querySelector('.textoNav');
-let mensajeActual = 0;
-
-nav.innerHTML = `<span>${mensajesNav[mensajeActual]}</span>`;
-
-setInterval(() => {
-    const siguienteMensaje = (mensajeActual + 1) % mensajesNav.length;
-
-    const spanActual = nav.querySelector('span');
-    const spanNuevo = document.createElement('span');
-    spanNuevo.textContent = mensajesNav[siguienteMensaje];
-
-    // Inicia debajo (fuera de vista)
-    spanNuevo.style.transform = 'translateY(100%)';
-    spanNuevo.style.opacity = '0';
-
-    nav.appendChild(spanNuevo);
-
-    // Forzar reflow
-    void spanNuevo.offsetWidth;
-
-    // Activar transiciones
-    spanActual.style.transform = 'translateY(-100%)';
-    spanActual.style.opacity = '0';
-
-    spanNuevo.style.transform = 'translateY(0%)';
-    spanNuevo.style.opacity = '1';
-
-    // Limpiar
-    setTimeout(() => {
-        if (spanActual && spanActual.parentElement) {
-            nav.removeChild(spanActual);
-        }
-    }, 500);
-
-    mensajeActual = siguienteMensaje;
-}, 5000);
-
-
-// MOSTRAR NOMBRES DE LOS CURSOS
-document.querySelectorAll('.curso').forEach(curso => {
-    const nombre = curso.dataset.nombre;
-    const p = document.createElement('p');
-    p.textContent = nombre;
-    curso.appendChild(p);
-});
-
-// LOCAL STORAGE LOL
-document.querySelectorAll('.curso').forEach(curso => {
-    const codigo = curso.dataset.curso;
-    if (cursosCompletados.includes(codigo)) {
-        curso.classList.add('completado');
+// ==========================================
+// CLASE CURSO (ORIENTADA A OBJETOS)
+// ==========================================
+class Curso {
+    constructor(data, ciclo = 0) {
+        this.id = data.id;
+        this.nombre = data.nombre;
+        this.creditos = Number(data.creditos || 0);
+        this.codigoSira = data.codigoSira || null;
+        this.prerequisitos = data.prerequisitos || [];
+        this.ciclo = ciclo;
+        this.element = null;
     }
-});
-actualizarCursosBloqueados(); 
 
-// ESTO ES PARA QUE AL HACER CLICK EN UN CURSO SE MARQUE COMO COMPLETADO O NO
-document.querySelectorAll('.curso').forEach(curso => {
-    const codigo = curso.dataset.curso;
+    get completado() {
+        return cursosCompletados.has(this.id);
+    }
 
-    curso.addEventListener('click', async () => {
-        if (curso.classList.contains('bloqueado')) return;
+    obtenerFaltantes(creditosElectivos) {
+        const faltantes = [];
 
-        curso.classList.toggle('completado');
-        const estaCompletado = curso.classList.contains('completado');
-
-        if (estaCompletado) {
-            if (!cursosCompletados.includes(codigo)) {
-                cursosCompletados.push(codigo);
-                jsConfetti.addConfetti({
-                    emojis: ['🌈', '❤️', '✨', "🐬"],
-                    emojiSize: 20,
-                    confettiNumber: 150
-                });
-            }
-        } else {
-            cursosCompletados = cursosCompletados.filter(c => c !== codigo);
-        }
-
-        localStorage.setItem('cursosCompletados', JSON.stringify(cursosCompletados));
-
-        if (userUID) {
-            await setDoc(doc(db, "usuarios", userUID), {
-                cursosCompletados
-            });
-        }
-        actualizarCursosBloqueados();
-    });
-
-/*     curso.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        mostrarTooltipCurso(curso, e.pageX, e.pageY, 'info');
-    }); */
-});
-
-// IMPORTANTE: agregar el scope de Google Calendar al provider
-provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
-
-// EL LOGIN CON GOOGLE
-document.getElementById('login-btn').addEventListener('click', () => {
-    signInWithPopup(auth, provider)
-        .then(async (result) => {
-            const user = result.user;
-            userUID = user.uid;
-
-            // 👇 obtener el token de Google Calendar
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const accessToken = credential.accessToken;
-
-            console.log("Sesión iniciada como:", user.displayName);
-            console.log("Token de acceso para Calendar:", accessToken);
-
-            // Ocultar botón de login
-            const loginBtn = document.getElementById('login-btn');
-            loginBtn.style.display = 'none';
-
-            // Crear botón de sesión iniciada
-            const sesionBtn = document.createElement('button');
-            let contadorEspecial = 0;
-            sesionBtn.className = 'login-button';
-            sesionBtn.id = 'sesion-btn';
-            sesionBtn.textContent = `Sorpéndeme 👀`;
-
-            sesionBtn.addEventListener('click', () => {
-                contadorEspecial++;
-
-                if (contadorEspecial === 10) {
-                    contadorEspecial = 0;
-                    jsConfetti.addConfetti({
-                        emojis: ['💩', '🤣', '🤡', 'KBRAZO'],
-                        emojiSize: 50,
-                        confettiNumber: 5000
-                    });
-                    const easterEgg = document.createElement('div');
-                    easterEgg.className = 'easter-egg';
-                    easterEgg.innerHTML = `
-                        <img src="https://media.giphy.com/media/KcW0iKgbONHUxzWrIF/giphy.gif" width="480" height="480" alt="Easter Egg" />
-                    `;
-                    document.querySelectorAll('.easter-egg').forEach(e => e.remove());
-                    document.body.appendChild(easterEgg);
-
-                    const audio01 = document.getElementById('easter02');
-                    audio01.currentTime = 0;
-                    audio01.play().catch(e => {
-                        console.warn("Ups! me he olvidao el audio:", e);
-                    });
-
-                    setTimeout(() => {
-                        easterEgg.remove();
-                    }, 28000);    
-                } else {
-                    const audio02 = document.getElementById('easter01');
-                    audio02.currentTime = 0;
-                    audio02.play().catch(e => {
-                        console.warn("ME HE DEJADO EL AUDIO EN CASA COÑOOOOOO", e);
-                    });
-                }
-            });
-
-            loginBtn.parentNode.appendChild(sesionBtn);
-
-            // 🔥 Aquí ya tienes el token => úsalo para cargar tu FullCalendar
-            // Ejemplo rápido:
-            // cargarCalendario(accessToken);
-
-            const data = await cargarCursosFirestore();
-            if (data) {
-                cursosCompletados = data;
-                localStorage.setItem('cursosCompletados', JSON.stringify(data));
-
-                document.querySelectorAll('.curso').forEach(curso => {
-                    const codigo = curso.dataset.curso;
-                    if (cursosCompletados.includes(codigo)) {
-                        curso.classList.add('completado');
-                    } else {
-                        curso.classList.remove('completado');
+        for (const req of this.prerequisitos) {
+            if (req === 'allX') {
+                for (const [id, c] of mapaCursos.entries()) {
+                    if (c.ciclo >= 1 && c.ciclo <= 10 && !c.completado) {
+                        faltantes.push("Todos los cursos hasta el 10mo ciclo");
+                        break;
                     }
-                });
-
-                actualizarCursosBloqueados();
+                }
+            } else if (req === 'allXI') {
+                for (const [id, c] of mapaCursos.entries()) {
+                    if (c.ciclo >= 1 && c.ciclo <= 11 && !c.completado) {
+                        faltantes.push("Todos los cursos hasta el 11er ciclo");
+                        break;
+                    }
+                }
+            } else if (req === 'allXII') {
+                for (const [id, c] of mapaCursos.entries()) {
+                    if (c.ciclo >= 1 && c.ciclo <= 12 && !c.completado) {
+                        faltantes.push("Todos los cursos hasta el 12vo ciclo");
+                        break;
+                    }
+                }
+            } else if (req === '8CRD') {
+                if (creditosElectivos < 8) {
+                    faltantes.push("Mínimo 8 créditos electivos");
+                }
+            } else if (req === 'EXSM') {
+                if (!cursosCompletados.has('EXSM')) {
+                    faltantes.push("Examen de Suficiencia Médica");
+                }
+            } else if (!cursosCompletados.has(req)) {
+                // Si el requisito es un nivel de inglés (INA1, INA2, INB1, INB2):
+                if (nivelesIngles[req]) {
+                    faltantes.push(`Nivel de inglés ${nivelesIngles[req]}`);
+                } else {
+                    const reqObj = mapaCursos.get(req);
+                    faltantes.push(reqObj ? reqObj.nombre : req);
+                }
             }
-        })
-        .catch((error) => {
-            console.error("Error en el login:", error);
-        });
-});
+        }
+        return faltantes;
+    }
 
+    render(onClick, onMouseEnter, onMouseLeave, onContextMenu) {
+        const div = document.createElement('div');
+        div.className = `curso ${this.completado ? 'completado' : ''}`;
+        div.id = `curso-${this.id}`;
 
-// Cargar cursos completados desde Firestore
-async function cargarCursosFirestore() {
-    const docRef = doc(db, "usuarios", userUID);
-    const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? docSnap.data().cursosCompletados || [] : [];
+        const p = document.createElement('p');
+        p.textContent = this.nombre;
+        div.appendChild(p);
+
+        div.addEventListener('click', () => onClick(this));
+        div.addEventListener('mouseenter', (e) => onMouseEnter(this, e));
+        div.addEventListener('mouseleave', () => onMouseLeave());
+        div.addEventListener('contextmenu', (e) => onContextMenu(this, e));
+
+        this.element = div;
+        return div;
+    }
+
+    actualizarEstadoDOM(creditosElectivos) {
+        if (!this.element) return;
+
+        const faltantes = this.obtenerFaltantes(creditosElectivos);
+        const estaBloqueado = faltantes.length > 0 && !this.completado;
+
+        if (this.completado) {
+            this.element.classList.add('completado');
+            this.element.classList.remove('bloqueado');
+            this.element.style.pointerEvents = 'auto';
+            this.element.style.opacity = '1';
+        } else if (estaBloqueado) {
+            this.element.classList.remove('completado');
+            this.element.classList.add('bloqueado');
+            this.element.style.opacity = '0.5';
+        } else {
+            this.element.classList.remove('completado', 'bloqueado');
+            this.element.style.pointerEvents = 'auto';
+            this.element.style.opacity = '1';
+        }
+    }
 }
 
-// Actualizar el estado de los cursos bloqueados
-// Esta función revisa los cursos y actualiza su estado de bloqueado/completado
-function actualizarCursosBloqueados() {
-    const completados = new Set(
-        Array.from(document.querySelectorAll('.curso.completado'))
-            .map(c => c.dataset.curso)
-    );
+// ==========================================
+// RENDERIZADO DINÁMICO DE LA MALLA
+// ==========================================
+function construirMalla() {
+    const mainContainer = document.getElementById('malla-container');
+    const electivosContainer = document.getElementById('electivos-container');
+    const inglesContainer = document.getElementById('ingles-container');
+    const segundoIdiomaContainer = document.getElementById('segundo-idioma-container');
+    const egresadoContainer = document.getElementById('egresado-container');
+    const otrosContainer = document.getElementById('otros-container');
 
-    // Suma de créditos electivos completados
-    const creditosElectivos = Array.from(document.querySelectorAll('.curso.completado'))
-        .filter(c => c.closest('.electivos'))
-        .reduce((sum, c) => sum + Number(c.dataset.creditos || 0), 0);
+    if (!mainContainer) return;
 
-    // Agrupa cursos por ciclo (incluye electivos aunque no tengan .ciclo)
-    const cursosPorCiclo = {};
-    document.querySelectorAll('.curso').forEach(c => {
-        // Si no tiene ciclo, ponlo en un ciclo especial (por ejemplo, 0)
-        const ciclo = parseInt(c.closest('.ciclo')?.dataset.ciclo || c.closest('.electivos')?.dataset.ciclo || '0');
-        if (!cursosPorCiclo[ciclo]) cursosPorCiclo[ciclo] = [];
-        cursosPorCiclo[ciclo].push(c);
+    mainContainer.innerHTML = '';
+    electivosContainer.innerHTML = '';
+
+    // 1. Renderizar Ciclos
+    mallaData.ciclos.forEach(cicloData => {
+        const divCiclo = document.createElement('div');
+        divCiclo.className = 'ciclo';
+        divCiclo.setAttribute('data-ciclo', cicloData.numero);
+        divCiclo.innerHTML = `<p>CICLO ${cicloData.numero}</p>`;
+
+        cicloData.cursos.forEach(c => {
+            const cursoObj = new Curso(c, parseInt(cicloData.numero));
+            mapaCursos.set(cursoObj.id, cursoObj);
+            divCiclo.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+        });
+
+        mainContainer.appendChild(divCiclo);
     });
 
-    // Expande los tags especiales de prerequisito
-    const expandirPrerrequisitos = (tag) => {
-        if (tag === 'allX') {
-            // Todos los cursos hasta el 10mo ciclo (excluye electivos)
-            return Object.entries(cursosPorCiclo)
-                .filter(([c]) => parseInt(c) > 0 && parseInt(c) <= 10)
-                .flatMap(([, cursos]) => cursos.map(c => c.dataset.curso));
-        }
-        if (tag === 'allXII') {
-            // Todos los cursos hasta el 12vo ciclo (excluye electivos)
-            return Object.entries(cursosPorCiclo)
-                .filter(([c]) => parseInt(c) > 0 && parseInt(c) <= 12)
-                .flatMap(([, cursos]) => cursos.map(c => c.dataset.curso));
-        }
-        if (tag === '8CRD') {
-            // Si ya tienes 8 créditos electivos, no bloquea, si no, bloquea por este tag especial
-            return creditosElectivos >= 8 ? [] : ['__bloqueado_por_creditos__'];
-        }
-        return [tag];
+    // 2. Renderizar Electivos
+    mallaData.electivos.forEach(c => {
+        const cursoObj = new Curso(c, 14);
+        mapaCursos.set(cursoObj.id, cursoObj);
+        electivosContainer.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+    });
+
+    // 3. Renderizar Requisitos y Condiciones
+    const renderGrupoReq = (lista, contenedor) => {
+        if (!contenedor) return;
+        contenedor.innerHTML = '';
+        lista.forEach(c => {
+            const cursoObj = new Curso(c, 0);
+            mapaCursos.set(cursoObj.id, cursoObj);
+            contenedor.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+        });
     };
 
-    document.querySelectorAll('.curso').forEach(curso => {
-        const codigo = curso.dataset.curso;
-        const prereqs = (curso.dataset.prerequisito || '').split(',').filter(Boolean);
-        // Expande todos los prerequisitos (incluyendo los especiales)
-        const todosRequisitos = prereqs.flatMap(expandirPrerrequisitos);
-        // Faltantes reales (los que no están completados)
-        const faltantes = todosRequisitos.filter(req => !completados.has(req));
-        curso.setAttribute('data-prerequisitos-crudos', prereqs.join(','));
+    renderGrupoReq(mallaData.requisitos.ingles, inglesContainer);
+    renderGrupoReq(mallaData.requisitos.segundoIdioma, segundoIdiomaContainer);
+    renderGrupoReq(mallaData.requisitos.egresado, egresadoContainer);
+    renderGrupoReq(mallaData.requisitos.otros, otrosContainer);
 
-        if (faltantes.length === 0 || curso.classList.contains('completado')) {
-            curso.classList.remove('bloqueado');
-            curso.style.pointerEvents = 'auto';
-            curso.style.opacity = '1';
-            curso.removeAttribute('data-faltantes');
-        } else {
-            curso.classList.add('bloqueado');
-            curso.style.opacity = '0.5';
-            curso.setAttribute('data-faltantes', JSON.stringify(faltantes));
+    actualizarTodosLosEstados();
+}
+
+function calcularCreditosElectivos() {
+    let creditos = 0;
+    mallaData.electivos.forEach(e => {
+        if (cursosCompletados.has(e.id)) {
+            creditos += Number(e.creditos || 0);
         }
+    });
+    return creditos;
+}
+
+function actualizarTodosLosEstados() {
+    const creditosElectivos = calcularCreditosElectivos();
+    mapaCursos.forEach(cursoObj => {
+        cursoObj.actualizarEstadoDOM(creditosElectivos);
     });
 }
 
+// ==========================================
+// EVENTOS DE INTERACCIÓN Y TOOLTIPS
+// ==========================================
+async function handleCursoClick(cursoObj) {
+    const creditosElectivos = calcularCreditosElectivos();
+    if (cursoObj.obtenerFaltantes(creditosElectivos).length > 0 && !cursoObj.completado) return;
 
-// MOSTRAR TOOLTIP EN HOVER Y EN ANTICLICK
-function mostrarTooltipCurso(curso, x, y, tipo = 'info') {
-    const tooltip = document.getElementById('tooltip');
-    let html = '';
+    if (cursoObj.completado) {
+        // 1. Desmarcamos el curso actual
+        cursosCompletados.delete(cursoObj.id);
 
-    if (tipo === 'bloqueado') {
-        const crudos = (curso.dataset.prerequisitosCrudos || '').split(',').filter(Boolean);
-        const nombresFaltantes = crudos.map(cod => {
-            switch (cod) {
-                case 'allX': return "Todos los cursos hasta el 10mo ciclo";
-                case 'allXI': return "Todos los cursos hasta el 11vo ciclo";
-                case 'allXII': return "Todos los cursos hasta el 12vo ciclo";
-                case '8CRD': return "Mínimo 8 créditos electivos";
-                case 'EXSM': return "Examen de Suficiencia Médica";
-                case 'INA1':
-                case 'INA2':
-                case 'INB1':
-                case 'INB2':
-                    return `Nivel de inglés ${nivelesIngles[cod]}`;
-                default:
-                    const el = document.querySelector(`.curso[data-curso="${cod}"]`);
-                    return el ? el.dataset.nombre : cod;
-            }
-        });
-        html = `
-            <strong>Curso bloqueado</strong><br>
-            Requiere: ${nombresFaltantes.length ? nombresFaltantes.join(', ') : 'Ninguno'}
-        `;
+        // 2. PROPACIONAL EN CASCADA: Desmarca automáticamente todos los cursos
+        // dependientes que ya no cumplan sus requisitos
+        desmarcarDependientesInvalidos();
     } else {
-        const nombre = curso.dataset.nombre;
-        const codigo = curso.dataset.curso;
-        const creditos = curso.dataset.creditos || "N/A";
-        const prerequisitos = (curso.dataset.prerequisito || '')
-            .split(',')
-            .map(p => p.trim())
-            .filter(Boolean);
-
-        let nombresPrerequisitos = [];
-        nombresPrerequisitos = prerequisitos.map(cod => {
-            switch (cod) {
-                case 'allX':
-                    return 'Todos los cursos hasta el 10mo ciclo';
-                case 'allXI':
-                    return 'Todos los cursos hasta el 11vo ciclo';
-                case 'allXII':
-                    return 'Todos los cursos hasta el 12vo ciclo';
-                case '8CRD':
-                    return '8 créditos electivos aprobados';
-                case 'EXSM':
-                    return "Examen de Suficiencia Médica";
-                case 'INA1':
-                case 'INA2':
-                case 'INB1':
-                case 'INB2':
-                    return `Nivel de inglés ${nivelesIngles[cod]}`;
-                default:
-                    const cursoElem = document.querySelector(`.curso[data-curso="${cod}"]`);
-                    return cursoElem ? cursoElem.dataset.nombre : cod;
-            }
+        cursosCompletados.add(cursoObj.id);
+        jsConfetti.addConfetti({
+            emojis: ['🌈', '❤️', '✨', "🐬"],
+            emojiSize: 20,
+            confettiNumber: 150
         });
-
-
-        html = `
-            <strong>${nombre}</strong><br>
-            Código: ${codigo}<br>
-            Créditos: ${creditos}<br>
-            Pre-requisitos: ${nombresPrerequisitos.length > 0 ? nombresPrerequisitos.join(', ') : 'Ninguno'}
-        `;
     }
 
-    tooltip.innerHTML = html;
+    const arrayCompletados = [...cursosCompletados];
+    localStorage.setItem('cursosCompletados', JSON.stringify(arrayCompletados));
+
+    if (userUID) {
+        await setDoc(doc(db, "usuarios", userUID), {
+            cursosCompletados: arrayCompletados
+        });
+    }
+
+    actualizarTodosLosEstados();
+}
+
+//TODO: Arreglar niveles de ingles
+function handleMouseEnter(cursoObj, e) {
+    const creditosElectivos = calcularCreditosElectivos();
+    const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
+
+    if (faltantes.length > 0 && !cursoObj.completado) {
+        mostrarTooltip(e.pageX, e.pageY, `
+            <strong>Curso bloqueado</strong><br>
+            Te falta: ${faltantes.join(', ')}
+        `);
+    }
+}
+
+function handleMouseLeave() {
+    const tooltip = document.getElementById('tooltip');
+    if (tooltip) tooltip.style.display = 'none';
+}
+
+function handleContextMenu(cursoObj, e) {
+    e.preventDefault();
+    const creditosElectivos = calcularCreditosElectivos();
+    const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
+
+    const prereqNombres = cursoObj.prerequisitos.map(cod => {
+        if (cod === 'allX') return 'Todos los cursos hasta el 10mo ciclo';
+        if (cod === 'allXI') return 'Todos los cursos hasta el 11er ciclo';
+        if (cod === 'allXII') return 'Todos los cursos hasta el 12vo ciclo';
+        if (cod === '8CRD') return '8 créditos electivos aprobados';
+        if (cod === 'EXSM') return 'Examen de Suficiencia Médica';
+        if (nivelesIngles[cod]) return `Nivel de inglés ${nivelesIngles[cod]}`;
+        const c = mapaCursos.get(cod);
+        return c ? c.nombre : cod;
+    });
+
+    mostrarTooltip(e.pageX, e.pageY, `
+        <strong>${cursoObj.nombre}</strong><br>
+        Código: ${cursoObj.id}<br>
+        Créditos: ${cursoObj.creditos || 'N/A'}<br>
+        Pre-requisitos: ${prereqNombres.length > 0 ? prereqNombres.join(', ') : 'Ninguno'}
+    `);
+}
+
+function mostrarTooltip(x, y, htmlContent) {
+    const tooltip = document.getElementById('tooltip');
+    if (!tooltip) return;
+
+    tooltip.innerHTML = htmlContent;
     tooltip.style.display = 'block';
     tooltip.style.visibility = 'hidden';
-    tooltip.style.left = '0px';
-    tooltip.style.top = '0px';
 
     requestAnimationFrame(() => {
         const offset = 10;
@@ -389,12 +302,8 @@ function mostrarTooltipCurso(curso, x, y, tipo = 'info') {
         let left = x + offset;
         let top = y + offset;
 
-        if (left + tooltipWidth > pageWidth) {
-            left = x - tooltipWidth - offset;
-        }
-        if (top + tooltipHeight > pageHeight) {
-            top = y - tooltipHeight - offset;
-        }
+        if (left + tooltipWidth > pageWidth) left = x - tooltipWidth - offset;
+        if (top + tooltipHeight > pageHeight) top = y - tooltipHeight - offset;
 
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
@@ -402,29 +311,151 @@ function mostrarTooltipCurso(curso, x, y, tipo = 'info') {
     });
 }
 
-// Listeners unificados para tooltip
-document.querySelectorAll('.curso').forEach(curso => {
-    curso.addEventListener('mouseenter', (e) => {
-        if (curso.classList.contains('bloqueado')) {
-            mostrarTooltipCurso(curso, e.pageX, e.pageY, 'bloqueado');
+// ==========================================
+// ANIMACIÓN HEADER NAVBAR
+// ==========================================
+const mensajesNav = [
+    "Bienvenida, Fabiana",
+    "¿Lista para estudiar?",
+    "Malla Interactiva",
+    "Holas bolas :D",
+    "RECOÑOOOOOO",
+    "No te duermas",
+    "🎶 La vida es una lenteja 🎶",
+    "¿Qué tal tu día?",
+    "So pechicchibol 🥀",
+    "Ayuda keiko me tiene encerrao"
+];
+
+const nav = document.querySelector('.textoNav');
+let mensajeActual = 0;
+
+if (nav) {
+    nav.innerHTML = `<span>${mensajesNav[mensajeActual]}</span>`;
+    setInterval(() => {
+        const siguienteMensaje = (mensajeActual + 1) % mensajesNav.length;
+        const spanActual = nav.querySelector('span');
+        const spanNuevo = document.createElement('span');
+        spanNuevo.textContent = mensajesNav[siguienteMensaje];
+
+        spanNuevo.style.transform = 'translateY(100%)';
+        spanNuevo.style.opacity = '0';
+        nav.appendChild(spanNuevo);
+
+        void spanNuevo.offsetWidth;
+
+        spanActual.style.transform = 'translateY(-100%)';
+        spanActual.style.opacity = '0';
+        spanNuevo.style.transform = 'translateY(0%)';
+        spanNuevo.style.opacity = '1';
+
+        setTimeout(() => {
+            if (spanActual && spanActual.parentElement) nav.removeChild(spanActual);
+        }, 500);
+
+        mensajeActual = siguienteMensaje;
+    }, 5000);
+}
+
+// ==========================================
+// AUTHENTICATION & EASTER EGGS
+// ==========================================
+provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
+
+document.getElementById('login-btn')?.addEventListener('click', () => {
+    signInWithPopup(auth, provider)
+        .then(async (result) => {
+            const user = result.user;
+            userUID = user.uid;
+
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) loginBtn.style.display = 'none';
+
+            const sesionBtn = document.createElement('button');
+            let contadorEspecial = 0;
+            sesionBtn.className = 'login-button';
+            sesionBtn.id = 'sesion-btn';
+            sesionBtn.textContent = `Sorprendeme 👀`;
+
+            sesionBtn.addEventListener('click', () => {
+                contadorEspecial++;
+
+                if (contadorEspecial === 10) {
+                    contadorEspecial = 0;
+                    jsConfetti.addConfetti({
+                        emojis: ['💩', '🤣', '🤡'],
+                        emojiSize: 50,
+                        confettiNumber: 500
+                    });
+                    const easterEgg = document.createElement('div');
+                    easterEgg.className = 'easter-egg';
+                    easterEgg.innerHTML = `
+                        <img src="https://media.giphy.com/media/KcW0iKgbONHUxzWrIF/giphy.gif" width="480" height="480" alt="Easter Egg" />
+                    `;
+                    document.querySelectorAll('.easter-egg').forEach(e => e.remove());
+                    document.body.appendChild(easterEgg);
+
+                    const audio02 = document.getElementById('easter02');
+                    if (audio02) {
+                        audio02.currentTime = 0;
+                        audio02.play().catch(console.warn);
+                    }
+
+                    setTimeout(() => easterEgg.remove(), 28000);
+                } else {
+                    const audio01 = document.getElementById('easter01');
+                    if (audio01) {
+                        audio01.currentTime = 0;
+                        audio01.play().catch(console.warn);
+                    }
+                }
+            });
+
+            loginBtn.parentNode.appendChild(sesionBtn);
+
+            const docRef = doc(db, "usuarios", userUID);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data().cursosCompletados || [];
+                cursosCompletados = new Set(data);
+                localStorage.setItem('cursosCompletados', JSON.stringify(data));
+                actualizarTodosLosEstados();
+            }
+        })
+        .catch(console.error);
+});
+
+// FullCalendar Init
+document.addEventListener('DOMContentLoaded', () => {
+    construirMalla();
+
+    const calendarEl = document.getElementById('calendar');
+    if (calendarEl && typeof FullCalendar !== 'undefined') {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth'
+        });
+        calendar.render();
+    }
+});
+
+// Desmarca automáticamente en cascada cualquier curso aprobado que se quede sin prerrequisitos
+function desmarcarDependientesInvalidos() {
+    let huboCambios = true;
+
+    // Repetimos mientras haya cursos por desmarcar (para cubrir la cadena completa)
+    while (huboCambios) {
+        huboCambios = false;
+        const creditosElectivos = calcularCreditosElectivos();
+
+        for (const [id, cursoObj] of mapaCursos.entries()) {
+            if (cursoObj.completado) {
+                const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
+                // Si al curso aprobado ahora le falta algún requisito, se desmarca solo
+                if (faltantes.length > 0) {
+                    cursosCompletados.delete(id);
+                    huboCambios = true;
+                }
+            }
         }
-    });
-    curso.addEventListener('mouseleave', () => {
-        document.getElementById('tooltip').style.display = 'none';
-    });
-    curso.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        mostrarTooltipCurso(curso, e.pageX, e.pageY, 'info');
-    });
-});
-
-
-//TODO: RENDERIZAR CALENDARIO
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth'
-    });
-    calendar.render();
-});
-
+    }
+}
