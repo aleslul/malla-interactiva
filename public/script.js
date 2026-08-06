@@ -20,7 +20,25 @@ const provider = new GoogleAuthProvider();
 const jsConfetti = new JSConfetti();
 
 let userUID = null;
-let cursosCompletados = new Set(JSON.parse(localStorage.getItem('cursosCompletados')) || []);
+
+// Carga segura desde LocalStorage
+let cursosCompletados = new Set();
+try {
+    const guardados = JSON.parse(localStorage.getItem('cursosCompletados'));
+    if (Array.isArray(guardados)) {
+        cursosCompletados = new Set(guardados);
+    }
+} catch (e) {
+    console.warn("Error al leer cursosCompletados de localStorage:", e);
+}
+
+let resaltadoActivo = true;
+try {
+    resaltadoActivo = JSON.parse(localStorage.getItem('resaltadoActivo')) ?? true;
+} catch (e) {
+    resaltadoActivo = true;
+}
+
 const mapaCursos = new Map(); // Instancias de clase Curso
 
 const nivelesIngles = {
@@ -79,7 +97,6 @@ class Curso {
                     faltantes.push("Examen de Suficiencia Médica");
                 }
             } else if (!cursosCompletados.has(req)) {
-                // Si el requisito es un nivel de inglés (INA1, INA2, INB1, INB2):
                 if (nivelesIngles[req]) {
                     faltantes.push(`Nivel de inglés ${nivelesIngles[req]}`);
                 } else {
@@ -143,37 +160,44 @@ function construirMalla() {
     const egresadoContainer = document.getElementById('egresado-container');
     const otrosContainer = document.getElementById('otros-container');
 
-    if (!mainContainer) return;
+    if (!mainContainer) {
+        console.warn("No se encontró el contenedor #malla-container en el HTML.");
+        return;
+    }
 
     mainContainer.innerHTML = '';
-    electivosContainer.innerHTML = '';
+    if (electivosContainer) electivosContainer.innerHTML = '';
 
     // 1. Renderizar Ciclos
-    mallaData.ciclos.forEach(cicloData => {
-        const divCiclo = document.createElement('div');
-        divCiclo.className = 'ciclo';
-        divCiclo.setAttribute('data-ciclo', cicloData.numero);
-        divCiclo.innerHTML = `<p>CICLO ${cicloData.numero}</p>`;
+    if (mallaData && mallaData.ciclos) {
+        mallaData.ciclos.forEach(cicloData => {
+            const divCiclo = document.createElement('div');
+            divCiclo.className = 'ciclo';
+            divCiclo.setAttribute('data-ciclo', cicloData.numero);
+            divCiclo.innerHTML = `<p>CICLO ${cicloData.numero}</p>`;
 
-        cicloData.cursos.forEach(c => {
-            const cursoObj = new Curso(c, parseInt(cicloData.numero));
-            mapaCursos.set(cursoObj.id, cursoObj);
-            divCiclo.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+            cicloData.cursos.forEach(c => {
+                const cursoObj = new Curso(c, parseInt(cicloData.numero));
+                mapaCursos.set(cursoObj.id, cursoObj);
+                divCiclo.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+            });
+
+            mainContainer.appendChild(divCiclo);
         });
-
-        mainContainer.appendChild(divCiclo);
-    });
+    }
 
     // 2. Renderizar Electivos
-    mallaData.electivos.forEach(c => {
-        const cursoObj = new Curso(c, 14);
-        mapaCursos.set(cursoObj.id, cursoObj);
-        electivosContainer.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
-    });
+    if (mallaData && mallaData.electivos && electivosContainer) {
+        mallaData.electivos.forEach(c => {
+            const cursoObj = new Curso(c, 14);
+            mapaCursos.set(cursoObj.id, cursoObj);
+            electivosContainer.appendChild(cursoObj.render(handleCursoClick, handleMouseEnter, handleMouseLeave, handleContextMenu));
+        });
+    }
 
     // 3. Renderizar Requisitos y Condiciones
     const renderGrupoReq = (lista, contenedor) => {
-        if (!contenedor) return;
+        if (!contenedor || !lista) return;
         contenedor.innerHTML = '';
         lista.forEach(c => {
             const cursoObj = new Curso(c, 0);
@@ -182,21 +206,25 @@ function construirMalla() {
         });
     };
 
-    renderGrupoReq(mallaData.requisitos.ingles, inglesContainer);
-    renderGrupoReq(mallaData.requisitos.segundoIdioma, segundoIdiomaContainer);
-    renderGrupoReq(mallaData.requisitos.egresado, egresadoContainer);
-    renderGrupoReq(mallaData.requisitos.otros, otrosContainer);
+    if (mallaData && mallaData.requisitos) {
+        renderGrupoReq(mallaData.requisitos.ingles, inglesContainer);
+        renderGrupoReq(mallaData.requisitos.segundoIdioma, segundoIdiomaContainer);
+        renderGrupoReq(mallaData.requisitos.egresado, egresadoContainer);
+        renderGrupoReq(mallaData.requisitos.otros, otrosContainer);
+    }
 
     actualizarTodosLosEstados();
 }
 
 function calcularCreditosElectivos() {
     let creditos = 0;
-    mallaData.electivos.forEach(e => {
-        if (cursosCompletados.has(e.id)) {
-            creditos += Number(e.creditos || 0);
-        }
-    });
+    if (mallaData && mallaData.electivos) {
+        mallaData.electivos.forEach(e => {
+            if (cursosCompletados.has(e.id)) {
+                creditos += Number(e.creditos || 0);
+            }
+        });
+    }
     return creditos;
 }
 
@@ -205,6 +233,124 @@ function actualizarTodosLosEstados() {
     mapaCursos.forEach(cursoObj => {
         cursoObj.actualizarEstadoDOM(creditosElectivos);
     });
+
+    actualizarProgresoGeneral();
+}
+
+// ==========================================
+// RESUMEN GENERAL Y PROGRESO (GRID)
+// ==========================================
+function actualizarProgresoGeneral() {
+    try {
+        let creditosTotales = 0;
+        let creditosObtenidos = 0;
+
+        let cursosTotalesCount = 0;
+        let cursosCompletadosCount = 0;
+
+        mapaCursos.forEach(curso => {
+            if (curso.ciclo >= 1 && curso.ciclo <= 13) {
+                creditosTotales += curso.creditos;
+                cursosTotalesCount++;
+
+                if (curso.completado) {
+                    creditosObtenidos += curso.creditos;
+                    cursosCompletadosCount++;
+                }
+            }
+        });
+
+        const creditosElectivosReales = calcularCreditosElectivos();
+        const maxElectivosRequeridos = 8;
+        
+        creditosTotales += maxElectivosRequeridos;
+        creditosObtenidos += Math.min(creditosElectivosReales, maxElectivosRequeridos);
+
+        const porcentaje = creditosTotales > 0 
+            ? Math.round((creditosObtenidos / creditosTotales) * 100) 
+            : 0;
+
+        const elCreditos = document.getElementById('creditos-texto');
+        const elCursos = document.getElementById('cursos-texto');
+        const elPorcentaje = document.getElementById('porcentaje-texto');
+        const elBarraFill = document.getElementById('barra-fill');
+
+        if (elCreditos) elCreditos.textContent = `${creditosObtenidos} / ${creditosTotales} Cr.`;
+        if (elCursos) elCursos.textContent = `${cursosCompletadosCount} / ${cursosTotalesCount}`;
+        if (elPorcentaje) elPorcentaje.textContent = `${porcentaje}%`;
+        if (elBarraFill) elBarraFill.style.width = `${porcentaje}%`;
+    } catch (error) {
+        console.error("Error al calcular el progreso general:", error);
+    }
+}
+
+// Desmarca automáticamente en cascada cualquier curso aprobado que se quede sin prerrequisitos
+function desmarcarDependientesInvalidos() {
+    let huboCambios = true;
+
+    while (huboCambios) {
+        huboCambios = false;
+        const creditosElectivos = calcularCreditosElectivos();
+
+        for (const [id, cursoObj] of mapaCursos.entries()) {
+            if (cursoObj.completado) {
+                const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
+                if (faltantes.length > 0) {
+                    cursosCompletados.delete(id);
+                    huboCambios = true;
+                }
+            }
+        }
+    }
+}
+
+// ==========================================
+// RESALTADO DE ANTECESORES Y SUCESORES
+// ==========================================
+function obtenerAntecesores(cursoId, visitados = new Set()) {
+    const cursoObj = mapaCursos.get(cursoId);
+    if (!cursoObj) return visitados;
+
+    cursoObj.prerequisitos.forEach(req => {
+        if (mapaCursos.has(req) && !visitados.has(req)) {
+            visitados.add(req);
+            obtenerAntecesores(req, visitados);
+        }
+    });
+
+    return visitados;
+}
+
+function obtenerSucesores(cursoId, visitados = new Set()) {
+    for (const [id, cursoObj] of mapaCursos.entries()) {
+        if (cursoObj.prerequisitos.includes(cursoId) && !visitados.has(id)) {
+            visitados.add(id);
+            obtenerSucesores(id, visitados);
+        }
+    }
+
+    return visitados;
+}
+
+function limpiarResaltado() {
+    mapaCursos.forEach(cursoObj => {
+        if (cursoObj.element) {
+            cursoObj.element.classList.remove('antecesor', 'sucesor');
+        }
+    });
+}
+
+function actualizarBotonResaltado() {
+    const btn = document.getElementById('toggle-resaltado-btn');
+    if (!btn) return;
+
+    if (resaltadoActivo) {
+        btn.textContent = 'Desactivar Resaltado';
+        btn.classList.remove('desactivado');
+    } else {
+        btn.textContent = 'Activar Resaltado';
+        btn.classList.add('desactivado');
+    }
 }
 
 // ==========================================
@@ -215,11 +361,7 @@ async function handleCursoClick(cursoObj) {
     if (cursoObj.obtenerFaltantes(creditosElectivos).length > 0 && !cursoObj.completado) return;
 
     if (cursoObj.completado) {
-        // 1. Desmarcamos el curso actual
         cursosCompletados.delete(cursoObj.id);
-
-        // 2. PROPACIONAL EN CASCADA: Desmarca automáticamente todos los cursos
-        // dependientes que ya no cumplan sus requisitos
         desmarcarDependientesInvalidos();
     } else {
         cursosCompletados.add(cursoObj.id);
@@ -233,17 +375,38 @@ async function handleCursoClick(cursoObj) {
     const arrayCompletados = [...cursosCompletados];
     localStorage.setItem('cursosCompletados', JSON.stringify(arrayCompletados));
 
+    // Guardamos cursosCompletados Y resaltadoActivo en Firestore
     if (userUID) {
         await setDoc(doc(db, "usuarios", userUID), {
-            cursosCompletados: arrayCompletados
-        });
+            cursosCompletados: arrayCompletados,
+            resaltadoActivo: resaltadoActivo
+        }, { merge: true });
     }
 
     actualizarTodosLosEstados();
 }
 
-//TODO: Arreglar niveles de ingles
 function handleMouseEnter(cursoObj, e) {
+    limpiarResaltado();
+
+    if (resaltadoActivo) {
+        const antecesores = obtenerAntecesores(cursoObj.id);
+        antecesores.forEach(reqId => {
+            const reqObj = mapaCursos.get(reqId);
+            if (reqObj && reqObj.element) {
+                reqObj.element.classList.add('antecesor');
+            }
+        });
+
+        const sucesores = obtenerSucesores(cursoObj.id);
+        sucesores.forEach(sucId => {
+            const sucObj = mapaCursos.get(sucId);
+            if (sucObj && sucObj.element) {
+                sucObj.element.classList.add('sucesor');
+            }
+        });
+    }
+
     const creditosElectivos = calcularCreditosElectivos();
     const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
 
@@ -258,12 +421,13 @@ function handleMouseEnter(cursoObj, e) {
 function handleMouseLeave() {
     const tooltip = document.getElementById('tooltip');
     if (tooltip) tooltip.style.display = 'none';
+
+    limpiarResaltado();
 }
 
 function handleContextMenu(cursoObj, e) {
     e.preventDefault();
     const creditosElectivos = calcularCreditosElectivos();
-    const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
 
     const prereqNombres = cursoObj.prerequisitos.map(cod => {
         if (cod === 'allX') return 'Todos los cursos hasta el 10mo ciclo';
@@ -413,21 +577,56 @@ document.getElementById('login-btn')?.addEventListener('click', () => {
 
             loginBtn.parentNode.appendChild(sesionBtn);
 
+            // Cargar datos del usuario desde Firestore
             const docRef = doc(db, "usuarios", userUID);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                const data = docSnap.data().cursosCompletados || [];
-                cursosCompletados = new Set(data);
-                localStorage.setItem('cursosCompletados', JSON.stringify(data));
+                const data = docSnap.data();
+                
+                // 1. Cargar Cursos Completados
+                const cursosData = data.cursosCompletados || [];
+                cursosCompletados = new Set(cursosData);
+                localStorage.setItem('cursosCompletados', JSON.stringify(cursosData));
+
+                // 2. Cargar Estado de Resaltado
+                if (data.resaltadoActivo !== undefined) {
+                    resaltadoActivo = Boolean(data.resaltadoActivo);
+                    localStorage.setItem('resaltadoActivo', JSON.stringify(resaltadoActivo));
+                    actualizarBotonResaltado();
+                }
+
                 actualizarTodosLosEstados();
             }
         })
         .catch(console.error);
 });
 
-// FullCalendar Init
+// ==========================================
+// DOM CONTENT LOADED (INICIALIZACIÓN)
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     construirMalla();
+    actualizarBotonResaltado();
+
+    const toggleBtn = document.getElementById('toggle-resaltado-btn');
+    toggleBtn?.addEventListener('click', async () => {
+        resaltadoActivo = !resaltadoActivo;
+        localStorage.setItem('resaltadoActivo', JSON.stringify(resaltadoActivo));
+        
+        actualizarBotonResaltado();
+        
+        if (!resaltadoActivo) {
+            limpiarResaltado();
+        }
+
+        // Guardar preferencia de resaltado en Firebase
+        if (userUID) {
+            await setDoc(doc(db, "usuarios", userUID), {
+                cursosCompletados: [...cursosCompletados],
+                resaltadoActivo: resaltadoActivo
+            }, { merge: true });
+        }
+    });
 
     const calendarEl = document.getElementById('calendar');
     if (calendarEl && typeof FullCalendar !== 'undefined') {
@@ -437,25 +636,3 @@ document.addEventListener('DOMContentLoaded', () => {
         calendar.render();
     }
 });
-
-// Desmarca automáticamente en cascada cualquier curso aprobado que se quede sin prerrequisitos
-function desmarcarDependientesInvalidos() {
-    let huboCambios = true;
-
-    // Repetimos mientras haya cursos por desmarcar (para cubrir la cadena completa)
-    while (huboCambios) {
-        huboCambios = false;
-        const creditosElectivos = calcularCreditosElectivos();
-
-        for (const [id, cursoObj] of mapaCursos.entries()) {
-            if (cursoObj.completado) {
-                const faltantes = cursoObj.obtenerFaltantes(creditosElectivos);
-                // Si al curso aprobado ahora le falta algún requisito, se desmarca solo
-                if (faltantes.length > 0) {
-                    cursosCompletados.delete(id);
-                    huboCambios = true;
-                }
-            }
-        }
-    }
-}

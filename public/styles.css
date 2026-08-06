@@ -213,6 +213,79 @@ h1{
     padding: 0 30px;
 }
 
+/* ==========================================
+   RESUMEN VISUAL / TARJETAS DE PROGRESO (GRID)
+   ========================================== */
+.progreso-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    background-color: var(--secundario);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-progreso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primario);
+    padding: 14px 10px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.card-titulo {
+    font-size: 0.82rem;
+    color: var(--texto);
+    opacity: 0.8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.card-valor {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--fondo);
+}
+
+/* Tarjeta que contiene la barra de progreso (Abarca las 3 columnas) */
+.card-progreso.barra-card {
+    grid-column: 1 / -1;
+    padding: 12px 18px;
+    background-color: var(--primario);
+}
+
+.barra-track {
+    width: 100%;
+    height: 16px;
+    background-color: var(--secundario);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.barra-fill {
+    height: 100%;
+    background-color: var(--fondo);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Adaptabilidad para pantallas móviles */
+@media (max-width: 768px) {
+    .progreso-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .main{
     height: auto;
     width: 100%;
@@ -246,6 +319,38 @@ h1{
     background-color: var(--fondo2);
 }
 
+/* Header de la Malla y Botón Toggle */
+.mainHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.toggle-btn {
+    border-radius: 8px;
+    border: 2px solid var(--fondo);
+    padding: 8px 16px;
+    background-color: var(--secundario);
+    color: var(--fondo);
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.toggle-btn:hover {
+    background-color: var(--fondo);
+    color: var(--secundario);
+}
+
+/* Estado Desactivado */
+.toggle-btn.desactivado {
+    background-color: #e0e0e0;
+    color: #757575;
+    border-color: #b0b0b0;
+}
 
 .ciclo{
     padding: 10px;
@@ -394,4 +499,40 @@ h1{
     height: 200px;
     width: 200px;
     margin: 20px;
+}
+
+/* ==========================================
+    RESALTADO DE ANTECESORES Y SUCESORES
+   ========================================== */
+
+/* Antecesores (Upstream - Amarillo llamativo) */
+.curso.antecesor {
+    background-color: #FFD600 !important;
+    filter: none !important; /* Anula el filtro en escala de grises del estado bloqueado */
+    opacity: 1 !important;    /* Restaura la opacidad completa */
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.5);
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.curso.antecesor p {
+    color: #212121 !important;
+    font-weight: bold;
+}
+
+/* Sucesores (Downstream - Verde llamativo) */
+.curso.sucesor {
+    background-color: #00E676 !important;
+    filter: none !important; /* Anula el filtro en escala de grises del estado bloqueado */
+    opacity: 1 !important;    /* Restaura la opacidad completa */
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.5);
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.curso.sucesor p {
+    color: #003311 !important;
+    font-weight: bold;
 }

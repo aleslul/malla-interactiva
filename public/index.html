@@ -30,7 +30,29 @@
     </div>
 
     <div class="wrapMain">
-        <h2>Plan Curricular</h2>
+        <div class="mainHeader">
+            <h2>Plan Curricular</h2>
+            <button id="toggle-resaltado-btn" class="toggle-btn">Activar Resaltado</button>
+        </div>
+        <div id="progreso-container" class="progreso-grid">
+            <div class="card-progreso">
+                <span class="card-titulo">Créditos Aprobados</span>
+                <span id="creditos-texto" class="card-valor">0 / 0 Cr.</span>
+            </div>
+            <div class="card-progreso">
+                <span class="card-titulo">Cursos Aprobados</span>
+                <span id="cursos-texto" class="card-valor">0 / 0</span>
+            </div>
+            <div class="card-progreso">
+                <span class="card-titulo">Avance de Carrera</span>
+                <span id="porcentaje-texto" class="card-valor">0%</span>
+            </div>
+            <div class="card-progreso barra-card">
+                <div class="barra-track">
+                    <div id="barra-fill" class="barra-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
         <div id="malla-container" class="main"></div>
     </div>
 
